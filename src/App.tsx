@@ -1,5 +1,7 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import NodeElement from "./NodeElement";
+import { RecoilRoot, useRecoilState } from "recoil";
+import { nodeState } from "./state";
 
 const data = {
   root: {
@@ -27,12 +29,30 @@ const data = {
 };
 
 function App() {
+
+  function InnerApp() {
+    const [nodeText, setNode] = useRecoilState(nodeState);
+
+    const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+      setNode(event.target.value);
+    };
+
+    return (
+        <div className="App">
+          <input type="text" value={nodeText} onChange={onChange} />
+          Echo: {nodeText}
+          <br />
+          <ul>
+            <NodeElement node={data.root} />
+          </ul>
+        </div>
+    );
+  }
+
   return (
-    <div className="App">
-      <ul>
-        <NodeElement node={data.root} />
-      </ul>
-    </div>
+    <RecoilRoot>
+      <InnerApp />
+    </RecoilRoot>
   );
 }
 
