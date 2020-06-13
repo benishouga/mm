@@ -4,14 +4,22 @@ import { RecoilRoot, useRecoilState } from "recoil";
 import { appState } from "./state";
 import { Node } from "./state";
 
-function NodeElement(props: { node: Node }) {
+function NodeElement(props: { nodeId: string }) {
   const [state, setState] = useRecoilState(appState);
+  const node = state.idMap[props.nodeId];
 
   const editNode = () => {
     setState({
       ...state,
-      editingNode: props.node,
-      tmpName: props.node.name,
+      editingId: props.nodeId,
+      tmpName: node.name
+    });
+  };
+
+  const selectNode = () => {
+    setState({
+      ...state,
+      selectingId: props.nodeId
     });
   };
 
@@ -23,21 +31,29 @@ function NodeElement(props: { node: Node }) {
   };
 
   let children: JSX.Element | null = null;
-  if (props.node.children.length > 0) {
+  if (node.children.length > 0) {
     children = (
       <ul>
-        {props.node.children.map((child) => (
-          <NodeElement node={child} />
+        {node.children.map(id => (
+          <NodeElement nodeId={id} key={id} />
         ))}
       </ul>
     );
   }
   return (
     <li>
-      {props.node === state.editingNode ? (
+      {props.nodeId === state.editingId ? (
         <input type="text" value={state.tmpName || ""} onChange={onChange} />
       ) : (
-        <p onDoubleClick={editNode}>{props.node.name}</p>
+        <p
+          onClick={selectNode}
+          onDoubleClick={editNode}
+          style={{
+            backgroundColor: props.nodeId === state.selectingId ? "cyan" : ""
+          }}
+        >
+          {node.name}
+        </p>
       )}
       {children}
     </li>

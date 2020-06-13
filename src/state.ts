@@ -1,24 +1,33 @@
 import { atom } from "recoil";
 
+export type IdMap = {
+  root: Node;
+  [id: string]: Node;
+};
+
 export type Node = {
   name: string;
-  children: Node[];
+  children: string[];
 };
 
 export type AppState = {
-    root: Node,
-    editingNode: Node | null,
-    tmpName: string | null
+  idMap: IdMap;
+  selectingId: string | null;
+  editingId: string | null;
+  tmpName: string | null;
 };
 
 export const appState = atom<AppState>({
   key: "appState",
   default: {
-    root: {
-      name: "root",
-      children: [],
+    idMap: {
+      root: {
+        name: "root",
+        children: []
+      }
     },
-    editingNode: null,
-    tmpName: null 
-  },
+    selectingId: null,
+    editingId: null,
+    tmpName: null
+  }
 });
