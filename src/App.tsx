@@ -1,51 +1,34 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import NodeElement from "./NodeElement";
 import { RecoilRoot, useRecoilState } from "recoil";
-import { nodeState } from "./state";
-
-const data = {
-  root: {
-    name: "hoge",
-    children: [
-      {
-        name: "fuga",
-        children: []
-      },
-      {
-        name: "piyo",
-        children: []
-      },
-      {
-        name: "foo",
-        children: [
-          {
-            name: "bar",
-            children: []
-          }
-        ]
-      }
-    ]
-  }
-};
+import { appState } from "./state";
 
 function App() {
-
   function InnerApp() {
-    const [nodeText, setNode] = useRecoilState(nodeState);
+    const [state, setState] = useRecoilState(appState);
 
-    const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-      setNode(event.target.value);
-    };
+    function downHandler({ key }: { key: string }) {
+      if (key === "Enter") {
+        setState({
+          ...state,
+          editingNode: null,
+        });
+      }
+    }
+
+    useEffect(() => {
+      window.addEventListener("keydown", downHandler);
+      return () => {
+        window.removeEventListener("keydown", downHandler);
+      };
+    }, []);
 
     return (
-        <div className="App">
-          <input type="text" value={nodeText} onChange={onChange} />
-          Echo: {nodeText}
-          <br />
-          <ul>
-            <NodeElement node={data.root} />
-          </ul>
-        </div>
+      <div className="App">
+        <ul>
+          <NodeElement node={state.root} />
+        </ul>
+      </div>
     );
   }
 
