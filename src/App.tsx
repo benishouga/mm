@@ -28,7 +28,7 @@ function App() {
             }
           }
         });
-      } else if (key === "Insert") {
+      } else if (key === "Insert" || key === "Tab") {
         const selectingId = state.selectingId;
 
         if (!selectingId) {
