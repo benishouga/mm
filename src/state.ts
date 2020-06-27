@@ -9,6 +9,7 @@ export type IdMap = {
 export type Node = {
   name: string;
   children: string[];
+  parent: string | null;
 };
 
 export type AppState = {
@@ -25,6 +26,7 @@ export const appState = atom<AppState>({
       root: {
         name: "root",
         children: [],
+        parent: null,
       },
     },
     selectingId: null,
@@ -50,8 +52,51 @@ export const useActions = () => {
         idMap: {
           ...state.idMap,
           [editingId]: {
+            ...state.idMap[editingId],
             name: tmpName,
-            children: state.idMap[editingId].children,
+          },
+        },
+      });
+    },
+
+    addSiblingNode: () => {
+      const selectingId = state.selectingId;
+
+      if (!selectingId) {
+        return;
+      }
+
+      const parentId = state.idMap[selectingId].parent;
+
+      if (!parentId) {
+        return;
+      }
+
+      const newId = uuidv4();
+
+      const index = state.idMap[parentId].children.indexOf(selectingId);
+
+      if(index == -1){
+        console.error('wtf state!')
+        return
+      }
+
+      const children = [...state.idMap[parentId].children]
+      children.splice(index + 1, 0, newId)
+
+      setState({
+        ...state,
+        editingId: null,
+        idMap: {
+          ...state.idMap,
+          [parentId]: {
+            ...state.idMap[parentId],
+            children
+          },
+          [newId]: {
+            name: "undefined",
+            children: [],
+            parent: parentId
           },
         },
       });
@@ -78,6 +123,7 @@ export const useActions = () => {
           [newId]: {
             name: "undefined",
             children: [],
+            parent: selectingId,
           },
         },
       });

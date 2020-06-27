@@ -6,14 +6,21 @@ import { appState, Node, useActions } from "./state";
 function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
-    const { completeNodeEditing, addNewNode } = useActions();
+    const { completeNodeEditing, addNewNode, addSiblingNode } = useActions();
 
     function downHandler(event: KeyboardEvent) {
       const key = event.key;
 
       if (key === "Enter") {
         event.preventDefault();
-        completeNodeEditing();
+
+        const editingId = state.editingId;
+
+        if (editingId) {
+          completeNodeEditing();
+        } else {
+          addSiblingNode();
+        }
       } else if (key === "Insert" || key === "Tab") {
         event.preventDefault();
         addNewNode();
