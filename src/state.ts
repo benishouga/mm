@@ -10,6 +10,7 @@ export type Node = {
   name: string;
   children: string[];
   parent: string | null;
+  id: string;
 };
 
 export type AppState = {
@@ -27,12 +28,13 @@ export const appState = atom<AppState>({
         name: "root",
         children: [],
         parent: null,
-      },
+        id: "root"
+      }
     },
     selectingId: null,
     editingId: null,
-    tmpName: null,
-  },
+    tmpName: null
+  }
 });
 
 export const useActions = () => {
@@ -53,9 +55,9 @@ export const useActions = () => {
           ...state.idMap,
           [editingId]: {
             ...state.idMap[editingId],
-            name: tmpName,
-          },
-        },
+            name: tmpName
+          }
+        }
       });
     },
 
@@ -76,13 +78,13 @@ export const useActions = () => {
 
       const index = state.idMap[parentId].children.indexOf(selectingId);
 
-      if(index == -1){
-        console.error('wtf state!')
-        return
+      if (index == -1) {
+        console.error("wtf state!");
+        return;
       }
 
-      const children = [...state.idMap[parentId].children]
-      children.splice(index + 1, 0, newId)
+      const children = [...state.idMap[parentId].children];
+      children.splice(index + 1, 0, newId);
 
       setState({
         ...state,
@@ -96,9 +98,10 @@ export const useActions = () => {
           [newId]: {
             name: "undefined",
             children: [],
-            parent: parentId
-          },
-        },
+            parent: parentId,
+            id: newId
+          }
+        }
       });
     },
 
@@ -118,15 +121,59 @@ export const useActions = () => {
           ...state.idMap,
           [selectingId]: {
             ...state.idMap[selectingId],
-            children: [...state.idMap[selectingId].children, newId],
+            children: [...state.idMap[selectingId].children, newId]
           },
           [newId]: {
             name: "undefined",
             children: [],
             parent: selectingId,
-          },
-        },
+            id: newId
+          }
+        }
       });
     },
+
+    deleteNode: () => {
+      // TODO: 親ノードから自分自身のIDを削除する
+      const selectingId = state.selectingId;
+      if (!selectingId) {
+        return;
+      }
+      const ids = collectIds(state.idMap[selectingId], state);
+      const newIdMap = {
+        ...state.idMap
+      };
+      ids.forEach(id => {
+        delete newIdMap[id];
+      });
+
+      const parentId = state.idMap[selectingId].parent;
+
+      if (!parentId) {
+        return;
+      }
+
+      const index = state.idMap[parentId].children.indexOf(selectingId);
+      const children = [...state.idMap[parentId].children];
+      children.splice(index, 1);
+
+      newIdMap[parentId] = { ...newIdMap[parentId], children };
+
+      setState({
+        ...state,
+        editingId: null,
+        idMap: newIdMap
+      });
+    }
   };
 };
+
+function collectIds(tree: Node, state: AppState) {
+  const ids = [tree.id];
+
+  tree.children.forEach(id => {
+    ids.concat(collectIds(state.idMap[id], state));
+  });
+
+  return ids;
+}

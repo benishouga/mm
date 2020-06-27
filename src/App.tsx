@@ -6,7 +6,7 @@ import { appState, Node, useActions } from "./state";
 function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
-    const { completeNodeEditing, addNewNode, addSiblingNode } = useActions();
+    const { completeNodeEditing, addNewNode, addSiblingNode, deleteNode } = useActions();
 
     function downHandler(event: KeyboardEvent) {
       const key = event.key;
@@ -25,35 +25,9 @@ function App() {
         event.preventDefault();
         addNewNode();
       } else if (key === "Delete") {
-        // TODO: 親ノードから自分自身のIDを削除する
-        // const selectingId = state.selectingId;
-        // if (!selectingId) {
-        //   return;
-        // }
-        // const ids = collectIds(state.idMap[selectingId]);
-        // const newIdMap = {
-        //   ...state.idMap
-        // }
-        // ids.forEach(id => {
-        //   delete newIdMap[id];
-        // });
-        // setState({
-        //   ...state,
-        //   editingId: null,
-        //   idMap: newIdMap
-        // });
+        event.preventDefault();
+        deleteNode();
       }
-    }
-
-    // TODO: 自分自身のIDを含めて返却
-    function collectIds(tree: Node) {
-      const ids = [...tree.children];
-
-      tree.children.forEach((id) => {
-        ids.concat(collectIds(state.idMap[id]));
-      });
-
-      return ids;
     }
 
     useEffect(() => {
