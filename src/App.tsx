@@ -1,64 +1,28 @@
-import React, { ChangeEvent, useEffect } from "react";
+import React, { useEffect } from "react";
 import NodeElement from "./NodeElement";
 import { RecoilRoot, useRecoilState } from "recoil";
-import { appState, Node } from "./state";
-import { v4 as uuidv4 } from "uuid";
+import { appState, Node, useActions } from "./state";
 
 function App() {
   function InnerApp() {
-    const [state, setState] = useRecoilState(appState);
+    const [state] = useRecoilState(appState);
+    const { completeNodeEditing, addNewNode } = useActions();
 
-    function downHandler({ key }: { key: string }) {
+    function downHandler(event: KeyboardEvent) {
+      const key = event.key;
+
       if (key === "Enter") {
-        const editingId = state.editingId;
-        const tmpName = state.tmpName || "";
-
-        if (!editingId) {
-          return;
-        }
-
-        setState({
-          ...state,
-          editingId: null,
-          idMap: {
-            ...state.idMap,
-            [editingId]: {
-              name: tmpName,
-              children: state.idMap[editingId].children
-            }
-          }
-        });
+        event.preventDefault();
+        completeNodeEditing();
       } else if (key === "Insert" || key === "Tab") {
-        const selectingId = state.selectingId;
-
-        if (!selectingId) {
-          return;
-        }
-
-        const newId = uuidv4();
-
-        setState({
-          ...state,
-          editingId: null,
-          idMap: {
-            ...state.idMap,
-            [selectingId]: {
-              ...state.idMap[selectingId],
-              children: [...state.idMap[selectingId].children, newId]
-            }, [newId]: {
-              name: "undefined",
-              children: []
-            }
-          }
-        });
+        event.preventDefault();
+        addNewNode();
       } else if (key === "Delete") {
-        // TODO: 親ノードから自分自身のIDを削除する 
+        // TODO: 親ノードから自分自身のIDを削除する
         // const selectingId = state.selectingId;
-
         // if (!selectingId) {
         //   return;
         // }
-
         // const ids = collectIds(state.idMap[selectingId]);
         // const newIdMap = {
         //   ...state.idMap
@@ -66,7 +30,6 @@ function App() {
         // ids.forEach(id => {
         //   delete newIdMap[id];
         // });
-
         // setState({
         //   ...state,
         //   editingId: null,
@@ -78,9 +41,9 @@ function App() {
     // TODO: 自分自身のIDを含めて返却
     function collectIds(tree: Node) {
       const ids = [...tree.children];
-      
-      tree.children.forEach(id => {
-        ids.concat(collectIds(state.idMap[id]))
+
+      tree.children.forEach((id) => {
+        ids.concat(collectIds(state.idMap[id]));
       });
 
       return ids;
