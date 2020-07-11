@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import { AppState } from '../state';
 
 export const completeNodeEditing = (state: AppState) => {
@@ -8,15 +9,8 @@ export const completeNodeEditing = (state: AppState) => {
     return state;
   }
 
-  return {
-    ...state,
-    editingId: null,
-    idMap: {
-      ...state.idMap,
-      [editingId]: {
-        ...state.idMap[editingId],
-        name: tmpName,
-      },
-    },
-  };
+  return produce(state, (draft) => {
+    draft.editingId = null;
+    draft.idMap[editingId].name = tmpName;
+  });
 };

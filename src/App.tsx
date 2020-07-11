@@ -14,7 +14,7 @@ function App() {
       cancelNodeEditing,
       editNode,
       selectParentNode,
-      selectChildNode
+      selectChildNode,
     } = useActions();
 
     function downHandler(event: KeyboardEvent) {
@@ -34,6 +34,9 @@ function App() {
         event.preventDefault();
         addNewNode();
       } else if (key === 'Delete') {
+        if (state.editingId) {
+          return;
+        }
         event.preventDefault();
         deleteNode();
       } else if (key === 'Escape') {

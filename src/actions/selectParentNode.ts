@@ -1,17 +1,17 @@
+import { produce } from 'immer';
 import { AppState } from '../state';
 
 export const selectParentNode = (state: AppState) => {
-    if (!state.selectingId) {
-        return state;
-    }
+  if (!state.selectingId) {
+    return state;
+  }
 
-    const parentId = state.idMap[state.selectingId].parent;
-    if (!parentId) {
-        return state;
-    }
+  const parentId = state.idMap[state.selectingId].parent;
+  if (!parentId) {
+    return state;
+  }
 
-    return {
-        ...state,
-        selectingId: parentId
-    };
+  return produce(state, (draft) => {
+    draft.selectingId = parentId;
+  });
 };

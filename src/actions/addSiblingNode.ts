@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import { AppState } from '../state';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -23,26 +24,16 @@ export const addSiblingNode = (state: AppState, name: string) => {
     return state;
   }
 
-  const children = [...state.idMap[parentId].children];
-  children.splice(index + 1, 0, newId);
-
-  return {
-    ...state,
-    selectingId: newId,
-    editingId: newId,
-    tmpName: name,
-    idMap: {
-      ...state.idMap,
-      [parentId]: {
-        ...state.idMap[parentId],
-        children,
-      },
-      [newId]: {
-        name,
-        children: [],
-        parent: parentId,
-        id: newId,
-      },
-    },
-  };
+  return produce(state, (draft) => {
+    draft.selectingId = newId;
+    draft.editingId = newId;
+    draft.tmpName = name;
+    draft.idMap[parentId].children.splice(index + 1, 0, newId);
+    draft.idMap[newId] = {
+      name,
+      children: [],
+      parent: parentId,
+      id: newId,
+    };
+  });
 };
