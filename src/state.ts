@@ -1,12 +1,19 @@
 import { atom, useRecoilState } from 'recoil';
-import { v4 as uuidv4 } from 'uuid';
+import { completeNodeEditing } from './actions/completeNodeEditing';
+import { cancelNodeEditing } from './actions/cancelNodeEditing';
+import { addSiblingNode } from './actions/addSiblingNode';
+import { addNewNode } from './actions/addNewNode';
+import { deleteNode } from './actions/deleteNode';
+import { editNode } from './actions/editNode';
+import { selectNode } from './actions/selectNode';
+import { setTmpName } from './actions/setTmpName';
 
 export type IdMap = {
-  root: Node;
-  [id: string]: Node;
+  root: MmNode;
+  [id: string]: MmNode;
 };
 
-export type Node = {
+export type MmNode = {
   name: string;
   children: string[];
   parent: string | null;
@@ -37,28 +44,8 @@ export const appState = atom<AppState>({
   },
 });
 
-const completeNodeEditing = (state: AppState) => {
-  const editingId = state.editingId;
-  const tmpName = state.tmpName || '';
+const DEFAULT_NAME = 'undefined';
 
-  if (!editingId) {
-    return state;
-  }
-
-  return {
-    ...state,
-    editingId: null,
-    idMap: {
-      ...state.idMap,
-      [editingId]: {
-        ...state.idMap[editingId],
-        name: tmpName,
-      },
-    },
-  };
-};
-
-const defaultName = 'undefined';
 export const useActions = () => {
   const [state, setState] = useRecoilState(appState);
   return {
@@ -67,149 +54,31 @@ export const useActions = () => {
     },
 
     cancelNodeEditing: () => {
-      setState({ ...state, editingId: null });
+      setState(cancelNodeEditing(state));
     },
 
     addSiblingNode: () => {
-      const selectingId = state.selectingId;
-
-      if (!selectingId) {
-        return;
-      }
-
-      const parentId = state.idMap[selectingId].parent;
-
-      if (!parentId) {
-        return;
-      }
-
-      const newId = uuidv4();
-
-      const index = state.idMap[parentId].children.indexOf(selectingId);
-
-      if (index == -1) {
-        console.error('wtf state!');
-        return;
-      }
-
-      const children = [...state.idMap[parentId].children];
-      children.splice(index + 1, 0, newId);
-
-      setState({
-        ...state,
-        selectingId: newId,
-        editingId: newId,
-        tmpName: defaultName,
-        idMap: {
-          ...state.idMap,
-          [parentId]: {
-            ...state.idMap[parentId],
-            children,
-          },
-          [newId]: {
-            name: defaultName,
-            children: [],
-            parent: parentId,
-            id: newId,
-          },
-        },
-      });
+      setState(addSiblingNode(state, DEFAULT_NAME));
     },
 
     addNewNode: () => {
-      const selectingId = state.selectingId;
-
-      if (!selectingId) {
-        return;
-      }
-
-      const newId = uuidv4();
-
-      setState({
-        ...state,
-        selectingId: newId,
-        editingId: newId,
-        tmpName: defaultName,
-        idMap: {
-          ...state.idMap,
-          [selectingId]: {
-            ...state.idMap[selectingId],
-            children: [...state.idMap[selectingId].children, newId],
-          },
-          [newId]: {
-            name: defaultName,
-            children: [],
-            parent: selectingId,
-            id: newId,
-          },
-        },
-      });
+      setState(addNewNode(state, DEFAULT_NAME));
     },
 
     deleteNode: () => {
-      // TODO: 親ノードから自分自身のIDを削除する
-      const selectingId = state.selectingId;
-      if (!selectingId) {
-        return;
-      }
-      const ids = collectIds(state.idMap[selectingId], state);
-      const newIdMap = {
-        ...state.idMap,
-      };
-      ids.forEach((id) => {
-        delete newIdMap[id];
-      });
-
-      const parentId = state.idMap[selectingId].parent;
-
-      if (!parentId) {
-        return;
-      }
-
-      const index = state.idMap[parentId].children.indexOf(selectingId);
-      const children = [...state.idMap[parentId].children];
-      children.splice(index, 1);
-
-      newIdMap[parentId] = { ...newIdMap[parentId], children };
-
-      setState({
-        ...state,
-        editingId: null,
-        idMap: newIdMap,
-      });
+      setState(deleteNode(state));
     },
 
     editNode: (nodeId: string, name: string) => {
-      setState({
-        ...state,
-        editingId: nodeId,
-        tmpName: name,
-      });
+      setState(editNode(state, nodeId, name));
     },
 
     selectNode: (nodeId: string) => {
-      const newState = completeNodeEditing(state);
-      setState({
-        ...newState,
-        selectingId: nodeId,
-      });
+      setState(selectNode(state, nodeId));
     },
 
     setTmpName: (name: string) => {
-      setState({
-        ...state,
-        tmpName: name,
-      });
+      setState(setTmpName(state, name));
     },
   };
 };
-
-function collectIds(tree: Node, state: AppState) {
-  const ids = [tree.id];
-
-  tree.children.forEach((id) => {
-    ids.concat(collectIds(state.idMap[id], state));
-  });
-
-  return ids;
-}
