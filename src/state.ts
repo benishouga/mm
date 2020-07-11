@@ -9,6 +9,7 @@ import { selectNode } from './actions/selectNode';
 import { setTmpName } from './actions/setTmpName';
 import { selectParentNode } from './actions/selectParentNode';
 import { selectChildNode } from './actions/selectChildNode';
+import { selectUnderNode } from './actions/selectUnderNode';
 
 export type IdMap = {
   root: MmNode;
@@ -85,6 +86,10 @@ export const useActions = () => {
 
     selectChildNode: () => {
       setState(selectChildNode(state));
+    },
+
+    selectUnderNode: () => {
+      setState(selectUnderNode(state));
     },
 
     setTmpName: (name: string) => {

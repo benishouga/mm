@@ -15,6 +15,7 @@ function App() {
       editNode,
       selectParentNode,
       selectChildNode,
+      selectUnderNode,
     } = useActions();
 
     function downHandler(event: KeyboardEvent) {
@@ -60,6 +61,12 @@ function App() {
         }
         event.preventDefault();
         selectChildNode();
+      } else if (key === 'ArrowDown') {
+        if (state.editingId) {
+          return;
+        }
+        event.preventDefault();
+        selectUnderNode();
       }
     }
 
