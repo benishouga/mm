@@ -1,8 +1,8 @@
-import React, { ChangeEvent } from "react";
-import { useRecoilState } from "recoil";
+import React, { ChangeEvent } from 'react';
+import { useRecoilState } from 'recoil';
 
-import { appState, useActions } from "./state";
-import { useAutoFocus } from "./hooks";
+import { appState, useActions } from './state';
+import { useAutoFocus } from './hooks';
 
 function NodeElement(props: { nodeId: string }) {
   const [state] = useRecoilState(appState);
@@ -36,18 +36,13 @@ function NodeElement(props: { nodeId: string }) {
   return (
     <li>
       {props.nodeId === state.editingId ? (
-        <input
-          type="text"
-          value={state.tmpName || ""}
-          onChange={onChange}
-          ref={inputRef}
-        />
+        <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} />
       ) : (
         <p
           onClick={onClick}
           onDoubleClick={onDoubleClick}
           style={{
-            backgroundColor: props.nodeId === state.selectingId ? "cyan" : "",
+            backgroundColor: props.nodeId === state.selectingId ? 'cyan' : '',
           }}
         >
           {node.name}

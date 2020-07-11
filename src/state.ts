@@ -1,5 +1,5 @@
-import { atom, useRecoilState } from "recoil";
-import { v4 as uuidv4 } from "uuid";
+import { atom, useRecoilState } from 'recoil';
+import { v4 as uuidv4 } from 'uuid';
 
 export type IdMap = {
   root: Node;
@@ -21,14 +21,14 @@ export type AppState = {
 };
 
 export const appState = atom<AppState>({
-  key: "appState",
+  key: 'appState',
   default: {
     idMap: {
       root: {
-        name: "root",
+        name: 'root',
         children: [],
         parent: null,
-        id: "root",
+        id: 'root',
       },
     },
     selectingId: null,
@@ -39,7 +39,7 @@ export const appState = atom<AppState>({
 
 const completeNodeEditing = (state: AppState) => {
   const editingId = state.editingId;
-  const tmpName = state.tmpName || "";
+  const tmpName = state.tmpName || '';
 
   if (!editingId) {
     return state;
@@ -58,7 +58,7 @@ const completeNodeEditing = (state: AppState) => {
   };
 };
 
-const defaultName = "undefined";
+const defaultName = 'undefined';
 export const useActions = () => {
   const [state, setState] = useRecoilState(appState);
   return {
@@ -88,7 +88,7 @@ export const useActions = () => {
       const index = state.idMap[parentId].children.indexOf(selectingId);
 
       if (index == -1) {
-        console.error("wtf state!");
+        console.error('wtf state!');
         return;
       }
 
