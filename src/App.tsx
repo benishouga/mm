@@ -17,6 +17,7 @@ function App() {
       selectChildNode,
       selectUnderNode,
       selectOverNode,
+      undo,
     } = useActions();
 
     function downHandler(event: KeyboardEvent) {
@@ -74,6 +75,19 @@ function App() {
         }
         event.preventDefault();
         selectOverNode();
+      } else if (key === 'z' && (event.ctrlKey || event.metaKey)) {
+        if (state.editingId) {
+          return;
+        }
+        event.preventDefault();
+        undo();
+      } else if (key === 'y' && (event.ctrlKey || event.metaKey)) {
+        if (state.editingId) {
+          return;
+        }
+        event.preventDefault();
+        // TODO
+        // redo();
       }
     }
 

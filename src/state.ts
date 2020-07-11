@@ -11,6 +11,7 @@ import { selectParentNode } from './actions/selectParentNode';
 import { selectChildNode } from './actions/selectChildNode';
 import { selectUnderNode } from './actions/selectUnderNode';
 import { selectOverNode } from './actions/selectOverNode';
+import { undo } from './actions/undo';
 
 export type IdMap = {
   root: MmNode;
@@ -24,24 +25,36 @@ export type MmNode = {
   id: string;
 };
 
+export type IdMapHistory = {
+  history: IdMap[];
+  currentIndex: number;
+};
+
 export type AppState = {
   idMap: IdMap;
+  idMapHistory: IdMapHistory;
   selectingId: string | null;
   editingId: string | null;
   tmpName: string | null;
 };
 
+const initialIdMap = {
+  root: {
+    name: 'root',
+    children: [],
+    parent: null,
+    id: 'root',
+  },
+};
+
 export const appState = atom<AppState>({
   key: 'appState',
   default: {
-    idMap: {
-      root: {
-        name: 'root',
-        children: [],
-        parent: null,
-        id: 'root',
-      },
+    idMapHistory: {
+      history: [initialIdMap],
+      currentIndex: 0,
     },
+    idMap: initialIdMap,
     selectingId: null,
     editingId: null,
     tmpName: null,
@@ -92,13 +105,17 @@ export const useActions = () => {
     selectUnderNode: () => {
       setState(selectUnderNode(state));
     },
-    
+
     selectOverNode: () => {
       setState(selectOverNode(state));
     },
 
     setTmpName: (name: string) => {
       setState(setTmpName(state, name));
+    },
+
+    undo: () => {
+      setState(undo(state));
     },
   };
 };

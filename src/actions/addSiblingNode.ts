@@ -1,6 +1,7 @@
 import { produce } from 'immer';
 import { AppState } from '../state';
 import { v4 as uuidv4 } from 'uuid';
+import { pushHistory } from './pushHistory';
 
 export const addSiblingNode = (state: AppState, name: string) => {
   const selectingId = state.selectingId;
@@ -24,16 +25,18 @@ export const addSiblingNode = (state: AppState, name: string) => {
     return state;
   }
 
-  return produce(state, (draft) => {
-    draft.selectingId = newId;
-    draft.editingId = newId;
-    draft.tmpName = name;
-    draft.idMap[parentId].children.splice(index + 1, 0, newId);
-    draft.idMap[newId] = {
-      name,
-      children: [],
-      parent: parentId,
-      id: newId,
-    };
-  });
+  return pushHistory(
+    produce(state, (draft) => {
+      draft.selectingId = newId;
+      draft.editingId = newId;
+      draft.tmpName = name;
+      draft.idMap[parentId].children.splice(index + 1, 0, newId);
+      draft.idMap[newId] = {
+        name,
+        children: [],
+        parent: parentId,
+        id: newId,
+      };
+    })
+  );
 };
