@@ -28,16 +28,16 @@ export const appState = atom<AppState>({
         name: "root",
         children: [],
         parent: null,
-        id: "root"
-      }
+        id: "root",
+      },
     },
     selectingId: null,
     editingId: null,
-    tmpName: null
-  }
+    tmpName: null,
+  },
 });
 
-const defaultName = "undefined"
+const defaultName = "undefined";
 export const useActions = () => {
   const [state, setState] = useRecoilState(appState);
   return {
@@ -56,10 +56,14 @@ export const useActions = () => {
           ...state.idMap,
           [editingId]: {
             ...state.idMap[editingId],
-            name: tmpName
-          }
-        }
+            name: tmpName,
+          },
+        },
       });
+    },
+
+    cancelNodeEditing: () => {
+      setState({ ...state, editingId: null });
     },
 
     addSiblingNode: () => {
@@ -96,15 +100,15 @@ export const useActions = () => {
           ...state.idMap,
           [parentId]: {
             ...state.idMap[parentId],
-            children
+            children,
           },
           [newId]: {
             name: defaultName,
             children: [],
             parent: parentId,
-            id: newId
-          }
-        }
+            id: newId,
+          },
+        },
       });
     },
 
@@ -126,15 +130,15 @@ export const useActions = () => {
           ...state.idMap,
           [selectingId]: {
             ...state.idMap[selectingId],
-            children: [...state.idMap[selectingId].children, newId]
+            children: [...state.idMap[selectingId].children, newId],
           },
           [newId]: {
             name: defaultName,
             children: [],
             parent: selectingId,
-            id: newId
-          }
-        }
+            id: newId,
+          },
+        },
       });
     },
 
@@ -146,9 +150,9 @@ export const useActions = () => {
       }
       const ids = collectIds(state.idMap[selectingId], state);
       const newIdMap = {
-        ...state.idMap
+        ...state.idMap,
       };
-      ids.forEach(id => {
+      ids.forEach((id) => {
         delete newIdMap[id];
       });
 
@@ -167,7 +171,7 @@ export const useActions = () => {
       setState({
         ...state,
         editingId: null,
-        idMap: newIdMap
+        idMap: newIdMap,
       });
     },
 
@@ -175,30 +179,30 @@ export const useActions = () => {
       setState({
         ...state,
         editingId: nodeId,
-        tmpName: name
+        tmpName: name,
       });
     },
 
     selectNode: (nodeId: string) => {
       setState({
         ...state,
-        selectingId: nodeId
+        selectingId: nodeId,
       });
     },
 
     setTmpName: (name: string) => {
       setState({
         ...state,
-        tmpName: name
+        tmpName: name,
       });
-    }
+    },
   };
 };
 
 function collectIds(tree: Node, state: AppState) {
   const ids = [tree.id];
 
-  tree.children.forEach(id => {
+  tree.children.forEach((id) => {
     ids.concat(collectIds(state.idMap[id], state));
   });
 

@@ -6,7 +6,13 @@ import { appState, Node, useActions } from "./state";
 function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
-    const { completeNodeEditing, addNewNode, addSiblingNode, deleteNode } = useActions();
+    const {
+      completeNodeEditing,
+      addNewNode,
+      addSiblingNode,
+      deleteNode,
+      cancelNodeEditing,
+    } = useActions();
 
     function downHandler(event: KeyboardEvent) {
       const key = event.key;
@@ -27,6 +33,9 @@ function App() {
       } else if (key === "Delete") {
         event.preventDefault();
         deleteNode();
+      } else if (key === "Escape") {
+        event.preventDefault();
+        cancelNodeEditing();
       }
     }
 
