@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import NodeElement from "./NodeElement";
 import { RecoilRoot, useRecoilState } from "recoil";
-import { appState, Node, useActions } from "./state";
+import { appState, useActions } from "./state";
 
 function App() {
   function InnerApp() {
