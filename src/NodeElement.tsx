@@ -1,33 +1,27 @@
 import React, { ChangeEvent } from "react";
 import { RecoilRoot, useRecoilState } from "recoil";
 
-import { appState } from "./state";
+import { appState, useActions } from "./state";
 import { Node } from "./state";
+import { useAutoFocus } from "./hooks";
 
 function NodeElement(props: { nodeId: string }) {
   const [state, setState] = useRecoilState(appState);
   const node = state.idMap[props.nodeId];
+  const { editNode, selectNode, setTmpName } = useActions();
+  const inputRef = useAutoFocus<HTMLInputElement>();
 
-  const editNode = () => {
-    setState({
-      ...state,
-      editingId: props.nodeId,
-      tmpName: node.name
-    });
+  const onDoubleClick = () => {
+    editNode(props.nodeId, node.name);
   };
 
-  const selectNode = () => {
-    setState({
-      ...state,
-      selectingId: props.nodeId
-    });
+  const onClick = () => {
+    selectNode(props.nodeId);
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...state,
-      tmpName: event.target.value
-    });
+    const name = event.target.value;
+    setTmpName(name);
   };
 
   let children: JSX.Element | null = null;
@@ -43,11 +37,11 @@ function NodeElement(props: { nodeId: string }) {
   return (
     <li>
       {props.nodeId === state.editingId ? (
-        <input type="text" value={state.tmpName || ""} onChange={onChange} />
+        <input type="text" value={state.tmpName || ""} onChange={onChange} ref={inputRef} />
       ) : (
         <p
-          onClick={selectNode}
-          onDoubleClick={editNode}
+          onClick={onClick}
+          onDoubleClick={onDoubleClick}
           style={{
             backgroundColor: props.nodeId === state.selectingId ? "cyan" : ""
           }}

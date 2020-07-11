@@ -37,6 +37,7 @@ export const appState = atom<AppState>({
   }
 });
 
+const defaultName = "undefined"
 export const useActions = () => {
   const [state, setState] = useRecoilState(appState);
   return {
@@ -88,7 +89,9 @@ export const useActions = () => {
 
       setState({
         ...state,
-        editingId: null,
+        selectingId: newId,
+        editingId: newId,
+        tmpName: defaultName,
         idMap: {
           ...state.idMap,
           [parentId]: {
@@ -96,7 +99,7 @@ export const useActions = () => {
             children
           },
           [newId]: {
-            name: "undefined",
+            name: defaultName,
             children: [],
             parent: parentId,
             id: newId
@@ -116,7 +119,9 @@ export const useActions = () => {
 
       setState({
         ...state,
-        editingId: null,
+        selectingId: newId,
+        editingId: newId,
+        tmpName: defaultName,
         idMap: {
           ...state.idMap,
           [selectingId]: {
@@ -124,7 +129,7 @@ export const useActions = () => {
             children: [...state.idMap[selectingId].children, newId]
           },
           [newId]: {
-            name: "undefined",
+            name: defaultName,
             children: [],
             parent: selectingId,
             id: newId
@@ -163,6 +168,28 @@ export const useActions = () => {
         ...state,
         editingId: null,
         idMap: newIdMap
+      });
+    },
+
+    editNode: (nodeId: string, name: string) => {
+      setState({
+        ...state,
+        editingId: nodeId,
+        tmpName: name
+      });
+    },
+
+    selectNode: (nodeId: string) => {
+      setState({
+        ...state,
+        selectingId: nodeId
+      });
+    },
+
+    setTmpName: (name: string) => {
+      setState({
+        ...state,
+        tmpName: name
       });
     }
   };
