@@ -6,7 +6,7 @@ import { appState, useActions } from './state';
 function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
-    const { completeNodeEditing, addNewNode, addSiblingNode, deleteNode, cancelNodeEditing, editNode } = useActions();
+    const { completeNodeEditing, addNewNode, addSiblingNode, deleteNode, cancelNodeEditing, editNode, selectParentNode } = useActions();
 
     function downHandler(event: KeyboardEvent) {
       const key = event.key;
@@ -36,6 +36,12 @@ function App() {
           return;
         }
         editNode(state.selectingId, state.idMap[state.selectingId].name);
+      } else if (key === 'ArrowLeft') {
+        if (state.editingId) {
+          return;
+        }
+        event.preventDefault();
+        selectParentNode();
       }
     }
 
