@@ -16,6 +16,7 @@ function App() {
       selectParentNode,
       selectChildNode,
       selectUnderNode,
+      selectOverNode,
     } = useActions();
 
     function downHandler(event: KeyboardEvent) {
@@ -67,6 +68,12 @@ function App() {
         }
         event.preventDefault();
         selectUnderNode();
+      } else if (key === 'ArrowUp') {
+        if (state.editingId) {
+          return;
+        }
+        event.preventDefault();
+        selectOverNode();
       }
     }
 
