@@ -37,29 +37,33 @@ export const appState = atom<AppState>({
   },
 });
 
+const completeNodeEditing = (state: AppState) => {
+  const editingId = state.editingId;
+  const tmpName = state.tmpName || "";
+
+  if (!editingId) {
+    return state;
+  }
+
+  return {
+    ...state,
+    editingId: null,
+    idMap: {
+      ...state.idMap,
+      [editingId]: {
+        ...state.idMap[editingId],
+        name: tmpName,
+      },
+    },
+  };
+};
+
 const defaultName = "undefined";
 export const useActions = () => {
   const [state, setState] = useRecoilState(appState);
   return {
     completeNodeEditing: () => {
-      const editingId = state.editingId;
-      const tmpName = state.tmpName || "";
-
-      if (!editingId) {
-        return;
-      }
-
-      setState({
-        ...state,
-        editingId: null,
-        idMap: {
-          ...state.idMap,
-          [editingId]: {
-            ...state.idMap[editingId],
-            name: tmpName,
-          },
-        },
-      });
+      setState(completeNodeEditing(state));
     },
 
     cancelNodeEditing: () => {
@@ -184,8 +188,9 @@ export const useActions = () => {
     },
 
     selectNode: (nodeId: string) => {
+      const newState = completeNodeEditing(state);
       setState({
-        ...state,
+        ...newState,
         selectingId: nodeId,
       });
     },
