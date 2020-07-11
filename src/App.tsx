@@ -6,7 +6,16 @@ import { appState, useActions } from './state';
 function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
-    const { completeNodeEditing, addNewNode, addSiblingNode, deleteNode, cancelNodeEditing, editNode, selectParentNode } = useActions();
+    const {
+      completeNodeEditing,
+      addNewNode,
+      addSiblingNode,
+      deleteNode,
+      cancelNodeEditing,
+      editNode,
+      selectParentNode,
+      selectChildNode
+    } = useActions();
 
     function downHandler(event: KeyboardEvent) {
       const key = event.key;
@@ -42,6 +51,12 @@ function App() {
         }
         event.preventDefault();
         selectParentNode();
+      } else if (key === 'ArrowRight') {
+        if (state.editingId) {
+          return;
+        }
+        event.preventDefault();
+        selectChildNode();
       }
     }
 
