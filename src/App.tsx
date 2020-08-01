@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import NodeElement from './NodeElement';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { appState, useActions } from './state';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 function App() {
   function InnerApp() {
@@ -108,9 +110,11 @@ function App() {
   }
 
   return (
-    <RecoilRoot>
-      <InnerApp />
-    </RecoilRoot>
+    <DndProvider backend={HTML5Backend}>
+      <RecoilRoot>
+        <InnerApp />
+      </RecoilRoot>
+    </DndProvider>
   );
 }
 

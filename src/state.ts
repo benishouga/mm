@@ -13,6 +13,8 @@ import { selectUnderNode } from './actions/selectUnderNode';
 import { selectOverNode } from './actions/selectOverNode';
 import { undo } from './actions/undo';
 import { redo } from './actions/redo';
+import { dropNode } from './actions/dropNode';
+import { dragNode } from './actions/dragNode';
 
 export type IdMap = {
   root: MmNode;
@@ -36,6 +38,7 @@ export type AppState = {
   idMapHistory: IdMapHistory;
   selectingId: string | null;
   editingId: string | null;
+  draggingId: string | null;
   tmpName: string | null;
 };
 
@@ -58,6 +61,7 @@ export const appState = atom<AppState>({
     idMap: initialIdMap,
     selectingId: null,
     editingId: null,
+    draggingId: null,
     tmpName: null,
   },
 });
@@ -121,6 +125,14 @@ export const useActions = () => {
     
     redo: () => {
       setState(redo(state));
+    },
+    
+    dropNode: (nodeId: string) => {
+      setState(dropNode(state, nodeId));
+    },
+    
+    dragNode: (nodeId: string) => {
+      setState(dragNode(state, nodeId));
     },
   };
 };

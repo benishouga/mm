@@ -1,5 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import { useRecoilState } from 'recoil';
+import { useDrop, useDrag } from 'react-dnd';
 
 import { appState, useActions } from './state';
 import { useAutoFocus } from './hooks';
@@ -9,6 +10,18 @@ function NodeElement(props: { nodeId: string }) {
   const node = state.idMap[props.nodeId];
   const { editNode, selectNode, setTmpName } = useActions();
   const inputRef = useAutoFocus<HTMLInputElement>();
+
+  const { dropNode, dragNode } = useActions();
+
+  const [, drop] = useDrop({
+    accept: 'node',
+    drop: () => dropNode(node.id),
+  });
+
+  const [, drag] = useDrag({
+    item: { type: 'node' },
+    begin: () => dragNode(node.id),
+  });
 
   const onDoubleClick = () => {
     editNode(props.nodeId, node.name);
@@ -39,13 +52,14 @@ function NodeElement(props: { nodeId: string }) {
         <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} />
       ) : (
         <p
+          ref={drop}
           onClick={onClick}
           onDoubleClick={onDoubleClick}
           style={{
             backgroundColor: props.nodeId === state.selectingId ? 'cyan' : '',
           }}
         >
-          {node.name}
+          <span ref={drag}>{node.name}</span>
         </p>
       )}
       {children}
