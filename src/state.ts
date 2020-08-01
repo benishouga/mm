@@ -12,6 +12,7 @@ import { selectChildNode } from './actions/selectChildNode';
 import { selectUnderNode } from './actions/selectUnderNode';
 import { selectOverNode } from './actions/selectOverNode';
 import { undo } from './actions/undo';
+import { redo } from './actions/redo';
 
 export type IdMap = {
   root: MmNode;
@@ -116,6 +117,10 @@ export const useActions = () => {
 
     undo: () => {
       setState(undo(state));
+    },
+    
+    redo: () => {
+      setState(redo(state));
     },
   };
 };

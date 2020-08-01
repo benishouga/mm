@@ -18,6 +18,7 @@ function App() {
       selectUnderNode,
       selectOverNode,
       undo,
+      redo,
     } = useActions();
 
     function downHandler(event: KeyboardEvent) {
@@ -86,8 +87,7 @@ function App() {
           return;
         }
         event.preventDefault();
-        // TODO
-        // redo();
+        redo();
       }
     }
 
