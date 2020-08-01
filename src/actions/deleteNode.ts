@@ -25,6 +25,21 @@ export const deleteNode = (state: AppState) => {
 
   const ids = collectIds(state.idMap[selectingId], state);
 
+  const parent = state.idMap[parentId];
+  const selectingNodeIndex = parent.children.indexOf(selectingId);
+
+  let nextSelectingNode: string;
+
+  if (parent.children.length === 1) {
+    nextSelectingNode = parentId;
+  } else {
+    if (selectingNodeIndex === 0) {
+      nextSelectingNode = parent.children[selectingNodeIndex + 1];
+    } else {
+      nextSelectingNode = parent.children[selectingNodeIndex - 1];
+    }
+  }
+
   return pushHistory(
     produce(state, (draft) => {
       ids.forEach((id) => {
@@ -33,7 +48,7 @@ export const deleteNode = (state: AppState) => {
 
       const index = state.idMap[parentId].children.indexOf(selectingId);
       draft.idMap[parentId].children.splice(index, 1);
-      draft.selectingId = null;
+      draft.selectingId = nextSelectingNode;
     })
   );
 };
