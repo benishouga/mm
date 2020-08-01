@@ -10,10 +10,16 @@ export const completeNodeEditing = (state: AppState) => {
     return state;
   }
 
-  return pushHistory(
-    produce(state, (draft) => {
-      draft.editingId = null;
-      draft.idMap[editingId].name = tmpName;
-    })
-  );
+  if (state.idMap[editingId].name === tmpName) {
+    const newState = { ...state };
+    newState.editingId = null;
+    return newState;
+  } else {
+    return pushHistory(
+      produce(state, (draft) => {
+        draft.editingId = null;
+        draft.idMap[editingId].name = tmpName;
+      })
+    );
+  }
 };
