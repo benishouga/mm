@@ -8,18 +8,23 @@ import { useAutoFocus } from './hooks';
 function NodeElement(props: { nodeId: string }) {
   const [state] = useRecoilState(appState);
   const node = state.idMap[props.nodeId];
-  const { editNode, selectNode, setTmpName } = useActions();
   const inputRef = useAutoFocus<HTMLInputElement>();
 
-  const { dropToBefore, dropToChild, dragNode } = useActions();
+  const { editNode, selectNode, setTmpName, dropToBefore, dropToChild, dragNode } = useActions();
 
-  const [, refDropToBefore] = useDrop({
+  const [{ isBeforeOver }, refDropToBefore] = useDrop({
     accept: 'node',
     drop: () => dropToBefore(node.id),
+    collect: (monitor) => ({
+      isBeforeOver: monitor.isOver(),
+    }),
   });
-  const [, refDropToChild] = useDrop({
+  const [{ isNodeOver }, refDropToChild] = useDrop({
     accept: 'node',
     drop: () => dropToChild(node.id),
+    collect: (monitor) => ({
+      isNodeOver: monitor.isOver(),
+    }),
   });
 
   const [, drag] = useDrag({
@@ -50,8 +55,16 @@ function NodeElement(props: { nodeId: string }) {
       </ul>
     );
   }
+
+  const backgroundBefore = isBeforeOver ? '#eee': 'white';
+  const backgroundNode = isNodeOver ? '#eee': 'white';
+
   return (
-    <li>
+    <li
+      style={{
+        position: 'relative',
+      }}
+    >
       {props.nodeId === state.editingId ? (
         <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} />
       ) : (
@@ -59,15 +72,21 @@ function NodeElement(props: { nodeId: string }) {
           <p
             ref={refDropToBefore}
             style={{
-              backgroundColor: 'magenta',
+              backgroundColor: backgroundBefore,
+              position: 'absolute',
+              top:'-33px',
+              width: '100%',
+              height: '16px'
             }}
-          >&nbsp;</p>
+          >
+             
+          </p>
           <p
             ref={refDropToChild}
             onClick={onClick}
             onDoubleClick={onDoubleClick}
             style={{
-              backgroundColor: props.nodeId === state.selectingId ? 'cyan' : '',
+              backgroundColor: props.nodeId === state.selectingId ? 'cyan' : backgroundNode,
             }}
           >
             <span ref={drag}>{node.name}</span>
