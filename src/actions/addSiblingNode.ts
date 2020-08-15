@@ -3,7 +3,7 @@ import { AppState } from '../state';
 import { v4 as uuidv4 } from 'uuid';
 import { pushHistory } from './pushHistory';
 
-export const addSiblingNode = (state: AppState, name: string) => {
+export const addSiblingNode = (state: AppState, _name: string) => {
   const selectingId = state.selectingId;
 
   if (!selectingId) {
@@ -29,10 +29,10 @@ export const addSiblingNode = (state: AppState, name: string) => {
     produce(state, (draft) => {
       draft.selectingId = newId;
       draft.editingId = newId;
-      draft.tmpName = name;
+      draft.tmpName = newId;
       draft.idMap[parentId].children.splice(index + 1, 0, newId);
       draft.idMap[newId] = {
-        name,
+        name: newId,
         children: [],
         parent: parentId,
         id: newId,

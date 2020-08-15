@@ -13,7 +13,8 @@ import { selectUnderNode } from './actions/selectUnderNode';
 import { selectOverNode } from './actions/selectOverNode';
 import { undo } from './actions/undo';
 import { redo } from './actions/redo';
-import { dropNode } from './actions/dropNode';
+import { dropToBefore } from './actions/dropToBefore';
+import { dropToChild } from './actions/dropToChild';
 import { dragNode } from './actions/dragNode';
 
 export type IdMap = {
@@ -127,8 +128,12 @@ export const useActions = () => {
       setState(redo(state));
     },
     
-    dropNode: (nodeId: string) => {
-      setState(dropNode(state, nodeId));
+    dropToBefore: (nodeId: string) => {
+      setState(dropToBefore(state, nodeId));
+    },
+
+    dropToChild: (nodeId: string) => {
+      setState(dropToChild(state, nodeId));
     },
     
     dragNode: (nodeId: string) => {

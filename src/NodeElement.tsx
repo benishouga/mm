@@ -11,11 +11,15 @@ function NodeElement(props: { nodeId: string }) {
   const { editNode, selectNode, setTmpName } = useActions();
   const inputRef = useAutoFocus<HTMLInputElement>();
 
-  const { dropNode, dragNode } = useActions();
+  const { dropToBefore, dropToChild, dragNode } = useActions();
 
-  const [, drop] = useDrop({
+  const [, refDropToBefore] = useDrop({
     accept: 'node',
-    drop: () => dropNode(node.id),
+    drop: () => dropToBefore(node.id),
+  });
+  const [, refDropToChild] = useDrop({
+    accept: 'node',
+    drop: () => dropToChild(node.id),
   });
 
   const [, drag] = useDrag({
@@ -51,16 +55,24 @@ function NodeElement(props: { nodeId: string }) {
       {props.nodeId === state.editingId ? (
         <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} />
       ) : (
-        <p
-          ref={drop}
-          onClick={onClick}
-          onDoubleClick={onDoubleClick}
-          style={{
-            backgroundColor: props.nodeId === state.selectingId ? 'cyan' : '',
-          }}
-        >
-          <span ref={drag}>{node.name}</span>
-        </p>
+        <>
+          <p
+            ref={refDropToBefore}
+            style={{
+              backgroundColor: 'magenta',
+            }}
+          >&nbsp;</p>
+          <p
+            ref={refDropToChild}
+            onClick={onClick}
+            onDoubleClick={onDoubleClick}
+            style={{
+              backgroundColor: props.nodeId === state.selectingId ? 'cyan' : '',
+            }}
+          >
+            <span ref={drag}>{node.name}</span>
+          </p>
+        </>
       )}
       {children}
     </li>
