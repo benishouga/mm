@@ -1,16 +1,7 @@
 import { produce } from 'immer';
-import { AppState, MmNode } from '../state';
+import { AppState } from '../state';
 import { pushHistory } from './pushHistory';
-
-function collectIds(tree: MmNode, state: AppState) {
-  const ids = [tree.id];
-
-  tree.children.forEach((id) => {
-    ids.concat(collectIds(state.idMap[id], state));
-  });
-
-  return ids;
-}
+import { collectChildrenIds } from './utils';
 
 export const deleteNode = (state: AppState) => {
   const selectingId = state.selectingId;
@@ -23,7 +14,7 @@ export const deleteNode = (state: AppState) => {
     return state;
   }
 
-  const ids = collectIds(state.idMap[selectingId], state);
+  const ids = collectChildrenIds(state.idMap[selectingId], state);
 
   const parent = state.idMap[parentId];
   const selectingNodeIndex = parent.children.indexOf(selectingId);
