@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+
+import './config';
 import NodeElement from './NodeElement';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { appState, useActions } from './state';
@@ -21,6 +23,8 @@ function App() {
       selectOverNode,
       undo,
       redo,
+      save,
+      load,
     } = useActions();
 
     function downHandler(event: KeyboardEvent) {
@@ -102,6 +106,8 @@ function App() {
 
     return (
       <div className="App">
+        <button onClick={() => save()}>save</button>
+        <button onClick={() => load()}>load</button>
         <ul>
           <NodeElement nodeId="root" />
         </ul>

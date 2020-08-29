@@ -16,6 +16,8 @@ import { redo } from './actions/redo';
 import { dropToBefore } from './actions/dropToBefore';
 import { dropToChild } from './actions/dropToChild';
 import { dragNode } from './actions/dragNode';
+import { save } from './actions/save';
+import { load } from './actions/load';
 
 export type IdMap = {
   root: MmNode;
@@ -123,11 +125,11 @@ export const useActions = () => {
     undo: () => {
       setState(undo(state));
     },
-    
+
     redo: () => {
       setState(redo(state));
     },
-    
+
     dropToBefore: (nodeId: string) => {
       setState(dropToBefore(state, nodeId));
     },
@@ -135,9 +137,17 @@ export const useActions = () => {
     dropToChild: (nodeId: string) => {
       setState(dropToChild(state, nodeId));
     },
-    
+
     dragNode: (nodeId: string) => {
       setState(dragNode(state, nodeId));
+    },
+
+    save: () => {
+      setState(save(state));
+    },
+
+    load: async () => {
+      setState(await load(state));
     },
   };
 };
