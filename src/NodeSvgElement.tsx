@@ -68,9 +68,12 @@ function NodeSvgElement(props: { nodeId: string }) {
         width={geometry.width}
         height={geometry.height}
         fill="none"
-        stroke="blue"
-        strokeWidth="2"
+        // stroke="blue"
+        // strokeWidth="2"
       />
+      <text dominantBaseline="hanging" x={geometry.left} y={geometry.top + geometry.height / 2}>
+        {node.name}
+      </text>
       {children}
     </>
   );

@@ -112,7 +112,7 @@ function App() {
         <ul>
           <NodeElement nodeId="root" />
         </ul>
-        <svg>
+        <svg viewBox="0 0 500 500" width="500" height="500">
           <NodeSvgElement nodeId="root" />
         </svg>
       </div>
