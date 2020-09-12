@@ -58,7 +58,7 @@ function layoutNodeGeometry(node: MmNode, state: AppState) {
       geometry: {
         ...childGeometry,
         top: nodeGeometry.top + top,
-        left: nodeGeometry.left + getTextWidth(node.name),
+        left: nodeGeometry.left + getTextWidth(node.name) + 30,
       },
     };
     layoutNodeGeometry(child, state);
