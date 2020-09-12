@@ -1,4 +1,4 @@
-import { atom, useRecoilState } from 'recoil';
+import { atom, useRecoilState, selector } from 'recoil';
 import { completeNodeEditing } from './actions/completeNodeEditing';
 import { cancelNodeEditing } from './actions/cancelNodeEditing';
 import { addSiblingNode } from './actions/addSiblingNode';
@@ -18,6 +18,8 @@ import { dropToChild } from './actions/dropToChild';
 import { dragNode } from './actions/dragNode';
 import { save } from './actions/save';
 import { load } from './actions/load';
+import { calculateNodeGeometry } from './actions/utils';
+import produce from 'immer';
 
 export type IdMap = {
   root: MmNode;
@@ -29,6 +31,14 @@ export type MmNode = {
   children: string[];
   parent: string | null;
   id: string;
+  ephemeral?: {
+    geometry: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+    };
+  };
 };
 
 export type IdMapHistory = {
@@ -66,6 +76,16 @@ export const appState = atom<AppState>({
     editingId: null,
     draggingId: null,
     tmpName: null,
+  },
+});
+
+export const calculatedAppState = selector({
+  key: 'calculatedAppState',
+  get: ({ get }) => {
+    const state = produce(get(appState), (draft) => {
+      calculateNodeGeometry(draft.idMap['root'], draft);
+    });
+    return state;
   },
 });
 

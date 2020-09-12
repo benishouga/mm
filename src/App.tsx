@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-
-import './config';
-import NodeElement from './NodeElement';
 import { RecoilRoot, useRecoilState } from 'recoil';
-import { appState, useActions } from './state';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+
+import './config';
+import { appState, useActions } from './state';
+import NodeElement from './NodeElement';
+import NodeSvgElement from './NodeSvgElement';
 
 function App() {
   function InnerApp() {
@@ -111,6 +112,9 @@ function App() {
         <ul>
           <NodeElement nodeId="root" />
         </ul>
+        <svg>
+          <NodeSvgElement nodeId="root" />
+        </svg>
       </div>
     );
   }
