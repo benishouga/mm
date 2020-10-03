@@ -16,6 +16,7 @@ export const dropToChild = (state: AppState, nodeId: string) => {
   return pushHistory(
     produce(state, (draft) => {
       console.log('ChildrenIds:' + JSON.stringify(collectChildrenIds(draft.idMap[draggingId], draft), null, ' '));
+      draft.draggingId = null;
       const draggingNode = draft.idMap[draggingId];
       if (collectChildrenIds(draggingNode, draft).indexOf(nodeId) !== -1) {
         return;
@@ -37,13 +38,12 @@ export const dropToChild = (state: AppState, nodeId: string) => {
       console.log('ChildrenToInsert:' + JSON.stringify(nodeToInsert.children, null, ' '));
 
       parentOfDraggingNode.children.splice(index, 1);
-      
+
       nodeToInsert.children.push(draggingId);
       draggingNode.parent = nodeId;
 
       console.log('After parentOfDraggingNode' + JSON.stringify(parentOfDraggingNode.children, null, ' '));
       console.log('After Children:' + JSON.stringify(nodeToInsert.children, null, ' '));
-      draft.draggingId = null;
     })
   );
 };

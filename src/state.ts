@@ -158,7 +158,7 @@ export const useActions = () => {
       setState(dropToChild(state, nodeId));
     },
 
-    dragNode: (nodeId: string) => {
+    dragNode: (nodeId: string | null) => {
       setState(dragNode(state, nodeId));
     },
 
