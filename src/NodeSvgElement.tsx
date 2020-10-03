@@ -23,7 +23,7 @@ function NodeSvgElement(props: { nodeId: string }) {
     setTmpName(name);
   };
 
-  const backgroundNode = 'white';
+  const textColor = 'black';
 
   // const onClick = () => {
   //   selectNode(props.nodeId);
@@ -47,30 +47,27 @@ function NodeSvgElement(props: { nodeId: string }) {
   };
   return (
     <>
+      {children}
       {props.nodeId === state.editingId ? (
-        <foreignObject x={geometry.left} y={geometry.top} width="100%" height={geometry.height}>
+        <foreignObject
+          x={geometry.left}
+          y={geometry.top + geometry.height / 2 - 13}
+          width="100%"
+          height={geometry.height}
+        >
           <input type="text" value={state.tmpName || ''} onChange={onChange} />
         </foreignObject>
       ) : (
         <>
-          <rect
-            x={geometry.left}
-            y={geometry.top}
-            width={geometry.width}
-            height={geometry.height}
-            fill={props.nodeId === state.selectingId ? 'cyan' : backgroundNode}
-            // stroke="blue"
-            // strokeWidth="2"
-          />
           <text
             onClick={onClick}
             onDoubleClick={onDoubleClick}
+            fill={props.nodeId === state.selectingId ? 'cyan' : textColor}
             x={geometry.left}
             y={geometry.top + geometry.height / 2 + 5}
           >
             {node.name}
           </text>
-          {children}
         </>
       )}
     </>
