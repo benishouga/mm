@@ -8,7 +8,11 @@ function NodeSvgElement(props: { nodeId: string }) {
   const state = useRecoilValue(calculatedAppState);
   const node = state.idMap[props.nodeId];
 
-  const { editNode, setTmpName } = useActions();
+  const { editNode, setTmpName, selectNode } = useActions();
+
+  const onClick = () => {
+    selectNode(props.nodeId);
+  };
 
   const onDoubleClick = () => {
     editNode(props.nodeId, node.name);
@@ -18,6 +22,8 @@ function NodeSvgElement(props: { nodeId: string }) {
     const name = event.target.value;
     setTmpName(name);
   };
+
+  const backgroundNode = 'white';
 
   // const onClick = () => {
   //   selectNode(props.nodeId);
@@ -52,11 +58,16 @@ function NodeSvgElement(props: { nodeId: string }) {
             y={geometry.top}
             width={geometry.width}
             height={geometry.height}
-            fill="none"
+            fill={props.nodeId === state.selectingId ? 'cyan' : backgroundNode}
             // stroke="blue"
             // strokeWidth="2"
           />
-          <text onDoubleClick={onDoubleClick} x={geometry.left} y={geometry.top + geometry.height / 2}>
+          <text
+            onClick={onClick}
+            onDoubleClick={onDoubleClick}
+            x={geometry.left}
+            y={geometry.top + geometry.height / 2 + 5}
+          >
             {node.name}
           </text>
           {children}
