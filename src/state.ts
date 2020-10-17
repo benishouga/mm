@@ -20,6 +20,7 @@ import { save } from './actions/save';
 import { load } from './actions/load';
 import { calculateNodeGeometry } from './actions/utils';
 import produce from 'immer';
+import { switchView } from './actions/switchView';
 
 export type IdMap = {
   root: MmNode;
@@ -53,6 +54,7 @@ export type AppState = {
   editingId: string | null;
   draggingId: string | null;
   tmpName: string | null;
+  viewMode: "bulletList" | "mindMap";
 };
 
 const initialIdMap = {
@@ -76,6 +78,7 @@ export const appState = atom<AppState>({
     editingId: null,
     draggingId: null,
     tmpName: null,
+    viewMode: 'mindMap',
   },
 });
 
@@ -168,6 +171,10 @@ export const useActions = () => {
 
     load: async () => {
       setState(await load(state));
+    },
+    
+    switchView: () => {
+      setState(switchView(state));
     },
   };
 };

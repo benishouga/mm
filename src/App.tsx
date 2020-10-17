@@ -26,6 +26,7 @@ function App() {
       redo,
       save,
       load,
+      switchView,
     } = useActions();
 
     function downHandler(event: KeyboardEvent) {
@@ -108,13 +109,19 @@ function App() {
     return (
       <div className="App">
         <button onClick={() => save()}>save</button>
-        <button onClick={() => load()}>load</button>
-        <ul>
-          <NodeElement nodeId="root" />
-        </ul>
-        <svg viewBox="0 0 500 500" width="500" height="500">
-          <NodeSvgElement nodeId="root" />
-        </svg>
+        <button onClick={() => load()}>load</button>&nbsp;|&nbsp;
+        <button onClick={() => switchView()}>switch</button>
+        {state.viewMode === 'bulletList' ? (
+          <ul>
+            <NodeElement nodeId="root" />
+          </ul>
+        ) : (
+          <div>
+            <svg viewBox="0 0 500 500" width="500" height="500">
+              <NodeSvgElement nodeId="root" />
+            </svg>
+          </div>
+        )}
       </div>
     );
   }
