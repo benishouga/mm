@@ -10,7 +10,9 @@ export const dropToBefore = (state: AppState, nodeId: string) => {
   const draggingId = state.draggingId;
 
   if (!draggingId || draggingId === nodeId) {
-    return state;
+    return produce(state, (draft) => {
+      draft.draggingId = null;
+    });
   }
 
   return pushHistory(

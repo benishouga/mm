@@ -1,9 +1,11 @@
 import React, { ChangeEvent } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useDrop, useDrag } from 'react-dnd';
+import { useDrop, useDrag, DragPreviewImage } from 'react-dnd';
 
 import { calculatedAppState, useActions } from './state';
 import LineSvgElement from './LineSvgElement';
+
+import { getTextWidth } from './actions/utils';
 
 function NodeSvgElement(props: { nodeId: string }) {
   const state = useRecoilValue(calculatedAppState);
@@ -25,7 +27,7 @@ function NodeSvgElement(props: { nodeId: string }) {
       isNodeOver: monitor.isOver(),
     }),
   });
-  const [, drag] = useDrag({
+  const [, drag, preview] = useDrag({
     item: { type: 'node' },
     begin: () => dragNode(node.id),
     end: (_, monitor) => {
@@ -49,9 +51,7 @@ function NodeSvgElement(props: { nodeId: string }) {
     setTmpName(name);
   };
 
-  const backgroundBefore = isBeforeOver ? '#eee' : 'white';
-  console.log(backgroundBefore);
-  const textColor = isNodeOver ? '#eee' : 'black';
+  const textColor = isNodeOver ? 'magenta' : 'black';
 
   // const onClick = () => {
   //   selectNode(props.nodeId);
@@ -73,6 +73,8 @@ function NodeSvgElement(props: { nodeId: string }) {
     width: 0,
     height: 0,
   };
+  const nodeWidth = getTextWidth(node.name);
+
   return (
     <>
       {children}
@@ -99,39 +101,48 @@ function NodeSvgElement(props: { nodeId: string }) {
           <foreignObject
             x={geometry.left}
             y={geometry.top + geometry.height / 2 - 10 - 10}
-            width="50px"
+            width={nodeWidth}
             height={geometry.height + 10}
           >
             {state.draggingId ? (
               <>
                 <div
+                  ref={refDropToBefore}
+                  style={{
+                    position: 'absolute',
+                    backgroundColor: isBeforeOver ? 'black' : 'transparent',
+                    opacity: 0.5,
+                    width: nodeWidth,
+                    height: '10px',
+                  }}
+                />
+                <div
                   ref={refDropToChild}
                   style={{
                     position: 'absolute',
                     top: '10px',
-                    backgroundColor: 'yellow',
                     opacity: 0.5,
-                    width: '50px',
+                    width: nodeWidth,
                     height: '20px',
                   }}
                 />
-                <div
-                  ref={refDropToBefore}
-                  style={{ position: 'absolute', backgroundColor: 'pink', opacity: 0.5, width: '50px', height: '20px' }}
-                />
               </>
             ) : (
-              <div
-                ref={drag}
-                style={{
-                  position: 'absolute',
-                  top: '10px',
-                  backgroundColor: 'magenta',
-                  opacity: 0.5,
-                  width: '50px',
-                  height: '20px',
-                }}
-              />
+              <>
+                <DragPreviewImage connect={preview} src="./dragging.png" />
+                <div
+                  ref={drag}
+                  onClick={onClick}
+                  onDoubleClick={onDoubleClick}
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    opacity: 0.5,
+                    width: nodeWidth,
+                    height: '20px',
+                  }}
+                />
+              </>
             )}
           </foreignObject>
         </>
