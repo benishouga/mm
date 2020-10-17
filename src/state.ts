@@ -21,6 +21,8 @@ import { load } from './actions/load';
 import { calculateNodeGeometry } from './actions/utils';
 import produce from 'immer';
 import { switchView } from './actions/switchView';
+import { selectOverSameDepthNode } from './actions/selectOverSameDepthNode';
+import { selectUnderSameDepthNode } from './actions/selectUnderSameDepthNode';
 
 export type IdMap = {
   root: MmNode;
@@ -137,8 +139,16 @@ export const useActions = () => {
       setState(selectUnderNode(state));
     },
 
+    selectUnderSameDepthNode: () => {
+      setState(selectUnderSameDepthNode(state));
+    },
+
     selectOverNode: () => {
       setState(selectOverNode(state));
+    },
+
+    selectOverSameDepthNode: () => {
+      setState(selectOverSameDepthNode(state));
     },
 
     setTmpName: (name: string) => {

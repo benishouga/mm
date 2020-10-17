@@ -21,7 +21,9 @@ function App() {
       selectParentNode,
       selectChildNode,
       selectUnderNode,
+      selectUnderSameDepthNode,
       selectOverNode,
+      selectOverSameDepthNode,
       undo,
       redo,
       save,
@@ -77,13 +79,25 @@ function App() {
           return;
         }
         event.preventDefault();
-        selectUnderNode();
+
+        if(state.viewMode === "bulletList"){
+          selectUnderNode();
+        }else{
+          selectUnderSameDepthNode()
+        }
+
       } else if (key === 'ArrowUp') {
         if (state.editingId) {
           return;
         }
-        event.preventDefault();
-        selectOverNode();
+        event.preventDefault();          
+
+        if(state.viewMode === "bulletList"){
+          selectOverNode();
+        }else{
+          selectOverSameDepthNode()
+        }
+
       } else if (key === 'z' && (event.ctrlKey || event.metaKey)) {
         if (state.editingId) {
           return;
