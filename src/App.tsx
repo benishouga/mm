@@ -12,6 +12,11 @@ function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
     const [mindMapAreaSize, setMindMapAreaSize] = useState({ width: 500, height: 800 });
+    const [isScrolling, setIsScrolling] = useState(false);
+    const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
+    const [scrollStartPosition, setScrollStartPosition] = useState({ x: 0, y: 0 });
+    const [scrollStartMousePosition, setScrollStartMousePosition] = useState({ x: 0, y: 0 });
+
     const {
       completeNodeEditing,
       addNewNode,
@@ -36,7 +41,7 @@ function App() {
     const mmAreaRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
 
-    function downHandler(event: KeyboardEvent) {
+    function keyDownHandler(event: KeyboardEvent) {
       const key = event.key;
 
       if (key === 'Enter') {
@@ -121,10 +126,32 @@ function App() {
       }
     }
 
+    function mouseUpHandler(_: MouseEvent) {
+      if (isScrolling) {
+        setIsScrolling(false);
+      }
+    }
+
     useEffect(() => {
-      window.addEventListener('keydown', downHandler);
+      window.addEventListener('mouseup', mouseUpHandler);
+      window.addEventListener('mousemove', mouseMoveHandler);
       return () => {
-        window.removeEventListener('keydown', downHandler);
+        window.removeEventListener('mouseup', mouseUpHandler);
+        window.removeEventListener('mousemove', mouseMoveHandler);
+      };
+    }, [isScrolling, scrollStartMousePosition]);
+
+    function mouseMoveHandler(event: MouseEvent) {
+      if (!isScrolling) return;
+      const x = scrollStartPosition.x + scrollStartMousePosition.x - event.pageX;
+      const y = scrollStartPosition.y + scrollStartMousePosition.y - event.pageY;
+      setScrollPosition({ x, y });
+    }
+
+    useEffect(() => {
+      window.addEventListener('keydown', keyDownHandler);
+      return () => {
+        window.removeEventListener('keydown', keyDownHandler);
       };
     }, [state]);
 
@@ -142,6 +169,12 @@ function App() {
       return () => window.removeEventListener('resize', handleResize);
     }, [mmAreaRef.current]);
 
+    const onMouseDown = (event: React.MouseEvent) => {
+      setIsScrolling(true);
+      setScrollStartPosition(scrollPosition);
+      setScrollStartMousePosition({ x: event.pageX, y: event.pageY });
+    };
+
     return (
       <div className="App">
         <div ref={headerRef}>
@@ -156,7 +189,8 @@ function App() {
         ) : (
           <div ref={mmAreaRef}>
             <svg
-              viewBox={`0 0 ${mindMapAreaSize.width} ${mindMapAreaSize.height}`}
+              onMouseDown={onMouseDown}
+              viewBox={`${scrollPosition.x} ${scrollPosition.y} ${mindMapAreaSize.width} ${mindMapAreaSize.height}`}
               width={mindMapAreaSize.width}
               height={mindMapAreaSize.height}
             >
