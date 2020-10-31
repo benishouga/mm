@@ -71,7 +71,6 @@ function layoutNodeGeometry(node: MmNode, state: AppState) {
 }
 
 export function calculateNodeGeometry(node: MmNode, state: AppState) {
-  console.log(node.id);
   measureNodeGeometry(node, state);
   layoutNodeGeometry(node, state);
   const nodeGeometry = node.ephemeral?.geometry || {

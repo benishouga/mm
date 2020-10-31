@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -11,6 +11,7 @@ import NodeSvgElement from './NodeSvgElement';
 function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
+    const [mindMapAreaSize, setMindMapAreaSize] = useState({ width: 500, height: 800 });
     const {
       completeNodeEditing,
       addNewNode,
@@ -31,6 +32,9 @@ function App() {
       load,
       switchView,
     } = useActions();
+
+    const mmAreaRef = useRef<HTMLDivElement>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
 
     function downHandler(event: KeyboardEvent) {
       const key = event.key;
@@ -124,18 +128,38 @@ function App() {
       };
     }, [state]);
 
+    useEffect(() => {
+      function handleResize() {
+        setMindMapAreaSize({
+          width: mmAreaRef.current?.clientWidth || 500,
+          height: window.innerHeight - (headerRef.current?.clientHeight || 24) - 24,
+        });
+      }
+
+      window.addEventListener('resize', handleResize);
+      handleResize();
+
+      return () => window.removeEventListener('resize', handleResize);
+    }, [mmAreaRef.current]);
+
     return (
       <div className="App">
-        <button onClick={() => save()}>save</button>
-        <button onClick={() => load()}>load</button>&nbsp;|&nbsp;
-        <button onClick={() => switchView()}>switch</button>
+        <div ref={headerRef}>
+          <button onClick={() => save()}>save</button>
+          <button onClick={() => load()}>load</button>&nbsp;|&nbsp;
+          <button onClick={() => switchView()}>switch</button>
+        </div>
         {state.viewMode === 'bulletList' ? (
           <ul>
             <NodeElement nodeId="root" />
           </ul>
         ) : (
-          <div>
-            <svg viewBox="0 0 500 500" width="500" height="500">
+          <div ref={mmAreaRef}>
+            <svg
+              viewBox={`0 0 ${mindMapAreaSize.width} ${mindMapAreaSize.height}`}
+              width={mindMapAreaSize.width}
+              height={mindMapAreaSize.height}
+            >
               <NodeSvgElement nodeId="root" />
             </svg>
           </div>
