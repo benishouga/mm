@@ -25,8 +25,9 @@ function measureNodeGeometry(node: MmNode, state: AppState): { width: number; he
   const currentHeight = Math.max(result.height, 30);
   node.ephemeral = {
     geometry: {
-      top: 0,
+      calculatingTop: 0,
       left: 0,
+      top: 0,
       width: currentWidth,
       height: currentHeight,
     },
@@ -40,8 +41,9 @@ function measureNodeGeometry(node: MmNode, state: AppState): { width: number; he
 function layoutNodeGeometry(node: MmNode, state: AppState) {
   let top = 0;
   const nodeGeometry = node.ephemeral?.geometry || {
-    top: 0,
+    calculatingTop: 0,
     left: 0,
+    top: 0,
     width: 0,
     height: 0,
   };
@@ -49,15 +51,17 @@ function layoutNodeGeometry(node: MmNode, state: AppState) {
   node.children.forEach((current) => {
     const child = state.idMap[current];
     const childGeometry = child.ephemeral?.geometry || {
-      top: 0,
+      calculatingTop: 0,
       left: 0,
+      top: 0,
       width: 0,
       height: 0,
     };
     child.ephemeral = {
       geometry: {
         ...childGeometry,
-        top: nodeGeometry.top + top,
+        calculatingTop: nodeGeometry.calculatingTop + top,
+        top: nodeGeometry.calculatingTop + top + childGeometry.height / 2,
         left: nodeGeometry.left + getTextWidth(node.name) + 30,
       },
     };
@@ -67,8 +71,22 @@ function layoutNodeGeometry(node: MmNode, state: AppState) {
 }
 
 export function calculateNodeGeometry(node: MmNode, state: AppState) {
+  console.log(node.id);
   measureNodeGeometry(node, state);
   layoutNodeGeometry(node, state);
+  const nodeGeometry = node.ephemeral?.geometry || {
+    calculatingTop: 0,
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+  };
+  node.ephemeral = {
+    geometry: {
+      ...nodeGeometry,
+      top: nodeGeometry.calculatingTop + nodeGeometry.height / 2,
+    },
+  };
 }
 
 export const getTextWidth = (() => {

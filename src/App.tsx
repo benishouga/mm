@@ -24,6 +24,7 @@ function App() {
       selectUnderSameDepthNode,
       selectOverNode,
       selectOverSameDepthNode,
+      selectRightMiddleNode,
       undo,
       redo,
       save,
@@ -67,37 +68,40 @@ function App() {
           return;
         }
         event.preventDefault();
+
         selectParentNode();
       } else if (key === 'ArrowRight') {
         if (state.editingId) {
           return;
         }
         event.preventDefault();
-        selectChildNode();
+        if (state.viewMode === 'bulletList') {
+          selectChildNode();
+        } else {
+          selectRightMiddleNode();
+        }
       } else if (key === 'ArrowDown') {
         if (state.editingId) {
           return;
         }
         event.preventDefault();
 
-        if(state.viewMode === "bulletList"){
+        if (state.viewMode === 'bulletList') {
           selectUnderNode();
-        }else{
-          selectUnderSameDepthNode()
+        } else {
+          selectUnderSameDepthNode();
         }
-
       } else if (key === 'ArrowUp') {
         if (state.editingId) {
           return;
         }
-        event.preventDefault();          
+        event.preventDefault();
 
-        if(state.viewMode === "bulletList"){
+        if (state.viewMode === 'bulletList') {
           selectOverNode();
-        }else{
-          selectOverSameDepthNode()
+        } else {
+          selectOverSameDepthNode();
         }
-
       } else if (key === 'z' && (event.ctrlKey || event.metaKey)) {
         if (state.editingId) {
           return;

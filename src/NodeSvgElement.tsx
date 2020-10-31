@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useDrop, useDrag, DragPreviewImage } from 'react-dnd';
 
-import { calculatedAppState, useActions } from './state';
+import { calculatedAppState, useActions, Geometry } from './state';
 import LineSvgElement from './LineSvgElement';
 
 import { getTextWidth } from './actions/utils';
@@ -53,23 +53,20 @@ function NodeSvgElement(props: { nodeId: string }) {
 
   const textColor = isNodeOver ? 'magenta' : 'black';
 
-  // const onClick = () => {
-  //   selectNode(props.nodeId);
-  // };
-
   let children: JSX.Element[] | null = null;
   if (node.children.length > 0) {
     children = node.children.map((id) => (
-      <>
-        <NodeSvgElement nodeId={id} key={id} />
+      <React.Fragment key={id}>
+        <NodeSvgElement nodeId={id} />
         <LineSvgElement parentNodeId={props.nodeId} childNodeId={id} />
-      </>
+      </React.Fragment>
     ));
   }
 
-  const geometry = node.ephemeral?.geometry || {
-    top: 0,
+  const geometry: Geometry = node.ephemeral?.geometry || {
+    calculatingTop: 0,
     left: 0,
+    top: 0,
     width: 0,
     height: 0,
   };
@@ -81,7 +78,7 @@ function NodeSvgElement(props: { nodeId: string }) {
       {props.nodeId === state.editingId ? (
         <foreignObject
           x={geometry.left}
-          y={geometry.top + geometry.height / 2 - 13}
+          y={geometry.calculatingTop + geometry.height / 2 - 13}
           width="100%"
           height={geometry.height}
         >
@@ -94,13 +91,13 @@ function NodeSvgElement(props: { nodeId: string }) {
             onDoubleClick={onDoubleClick}
             fill={props.nodeId === state.selectingId ? 'cyan' : textColor}
             x={geometry.left}
-            y={geometry.top + geometry.height / 2 + 5}
+            y={geometry.calculatingTop + geometry.height / 2 + 5}
           >
             {node.name}
           </text>
           <foreignObject
             x={geometry.left}
-            y={geometry.top + geometry.height / 2 - 10 - 10}
+            y={geometry.calculatingTop + geometry.height / 2 - 10 - 10}
             width={nodeWidth}
             height={geometry.height + 10}
           >

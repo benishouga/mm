@@ -1,4 +1,4 @@
-import { atom, useRecoilState, selector } from 'recoil';
+import { atom, useRecoilState, selector, useRecoilValue } from 'recoil';
 import { completeNodeEditing } from './actions/completeNodeEditing';
 import { cancelNodeEditing } from './actions/cancelNodeEditing';
 import { addSiblingNode } from './actions/addSiblingNode';
@@ -11,6 +11,7 @@ import { selectParentNode } from './actions/selectParentNode';
 import { selectChildNode } from './actions/selectChildNode';
 import { selectUnderNode } from './actions/selectUnderNode';
 import { selectOverNode } from './actions/selectOverNode';
+import { selectRightMiddleNode } from './actions/selectRightMiddleNode';
 import { undo } from './actions/undo';
 import { redo } from './actions/redo';
 import { dropToBefore } from './actions/dropToBefore';
@@ -35,13 +36,16 @@ export type MmNode = {
   parent: string | null;
   id: string;
   ephemeral?: {
-    geometry: {
-      top: number;
-      left: number;
-      width: number;
-      height: number;
-    };
+    geometry: Geometry;
   };
+};
+
+export type Geometry = {
+  calculatingTop: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 };
 
 export type IdMapHistory = {
@@ -56,7 +60,7 @@ export type AppState = {
   editingId: string | null;
   draggingId: string | null;
   tmpName: string | null;
-  viewMode: "bulletList" | "mindMap";
+  viewMode: 'bulletList' | 'mindMap';
 };
 
 const initialIdMap = {
@@ -98,6 +102,7 @@ const DEFAULT_NAME = 'undefined';
 
 export const useActions = () => {
   const [state, setState] = useRecoilState(appState);
+  const calculatedNodeState = useRecoilValue(calculatedAppState);
   return {
     completeNodeEditing: () => {
       setState(completeNodeEditing(state));
@@ -151,6 +156,10 @@ export const useActions = () => {
       setState(selectOverSameDepthNode(state));
     },
 
+    selectRightMiddleNode: () => {
+      setState(selectRightMiddleNode(calculatedNodeState));
+    },
+
     setTmpName: (name: string) => {
       setState(setTmpName(state, name));
     },
@@ -182,7 +191,7 @@ export const useActions = () => {
     load: async () => {
       setState(await load(state));
     },
-    
+
     switchView: () => {
       setState(switchView(state));
     },
