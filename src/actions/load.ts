@@ -1,18 +1,25 @@
 import { produce } from 'immer';
-import { AppState, IdMap } from '../state';
+import { AppState, IdMap, initialIdMap } from '../state';
 import firebase from 'firebase';
 
-export const load = async (state: AppState) => {
-  const ref = firebase.database().ref('/mm');
-  const data = await new Promise<IdMap>((resolve, reject) => {
+export const load = async (state: AppState, mmid: string) => {
+  const ref = firebase.database().ref(`/mmm/${mmid}`);
+  const data = await new Promise<IdMap | null>((resolve) => {
     ref.on('value', (snapshot) => {
       if (snapshot?.val()) {
         resolve(snapshot.val());
       } else {
-        reject();
+        resolve(null);
       }
     });
   });
+
+  if (!data) {
+    return produce(state, (draft) => {
+      draft.idMap =initialIdMap;
+    });
+  }
+
   Object.keys(data).forEach(
     (key) =>
       (data[key] = {

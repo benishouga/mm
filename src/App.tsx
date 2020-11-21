@@ -3,14 +3,17 @@ import { RecoilRoot, useRecoilState } from 'recoil';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
+import { v4 as uuidv4 } from 'uuid';
 import './config';
 import { appState, useActions } from './state';
 import BulletList from './BulletList';
 import MindMap from './MindMap';
+import { useHash } from './hooks';
 
 function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
+    const [hash, setHash] = useHash();
 
     const {
       completeNodeEditing,
@@ -88,11 +91,30 @@ function App() {
         window.removeEventListener('keydown', keyDownHandler);
       };
     }, [state]);
+
+    useEffect(() => {
+      let mmid = hash;
+      if (mmid) {
+        console.log(mmid);
+        load(mmid);
+      }
+    }, [hash]);
+
+    const onSave = () => {
+      let mmid = hash;
+      if (!mmid) {
+        mmid = uuidv4();
+        setHash(mmid);
+      }
+      save(mmid);
+    };
+
     return (
       <div className="App">
         <div ref={headerRef}>
-          <button onClick={() => save()}>save</button>
-          <button onClick={() => load()}>load</button>&nbsp;|&nbsp;
+          <button onClick={() => onSave()}>save</button>
+          {/* <button onClick={() => load()}>load</button> */}
+          &nbsp;|&nbsp;
           <button onClick={() => switchView()}>switch</button>
         </div>
         {state.viewMode === 'bulletList' ? <BulletList /> : <MindMap headerRef={headerRef} />}

@@ -63,7 +63,7 @@ export type AppState = {
   viewMode: 'bulletList' | 'mindMap';
 };
 
-const initialIdMap = {
+export const initialIdMap = {
   root: {
     name: 'root',
     children: [],
@@ -184,12 +184,12 @@ export const useActions = () => {
       setState(dragNode(state, nodeId));
     },
 
-    save: () => {
-      setState(save(state));
+    save: (mmid: string) => {
+      setState(save(state, mmid));
     },
 
-    load: async () => {
-      setState(await load(state));
+    load: async (mmid: string) => {
+      setState(await load(state, mmid));
     },
 
     switchView: () => {
