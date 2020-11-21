@@ -12,10 +12,9 @@ function NodeSvgElement(props: { nodeId: string }) {
   const state = useRecoilValue(calculatedAppState);
   const node = state.idMap[props.nodeId];
 
-  const inputRef = useAutoFocus<HTMLInputElement>();
+  const inputRef = useAutoFocus<HTMLInputElement>([state.editingId]);
 
-
-  const { editNode, setTmpName, selectNode, dragNode, dropToBefore, dropToChild } = useActions();
+  const { editNode, setTmpName, selectNode, dragNode, dropToBefore, dropToChild, completeNodeEditing } = useActions();
 
   const [{ isBeforeOver }, refDropToBefore] = useDrop({
     accept: 'node',
@@ -54,6 +53,10 @@ function NodeSvgElement(props: { nodeId: string }) {
     setTmpName(name);
   };
 
+  const onBlur = () => {
+    completeNodeEditing();
+  };
+
   const textColor = isNodeOver ? 'magenta' : 'black';
 
   let children: JSX.Element[] | null = null;
@@ -85,7 +88,7 @@ function NodeSvgElement(props: { nodeId: string }) {
           width="100%"
           height={geometry.height}
         >
-          <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} />
+          <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} onBlur={onBlur} />
         </foreignObject>
       ) : (
         <>

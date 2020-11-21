@@ -8,9 +8,9 @@ import { useAutoFocus } from './hooks';
 function NodeElement(props: { nodeId: string }) {
   const [state] = useRecoilState(appState);
   const node = state.idMap[props.nodeId];
-  const inputRef = useAutoFocus<HTMLInputElement>();
+  const inputRef = useAutoFocus<HTMLInputElement>([state.editingId]);
 
-  const { editNode, selectNode, setTmpName, dropToBefore, dropToChild, dragNode } = useActions();
+  const { editNode, selectNode, setTmpName, dropToBefore, dropToChild, dragNode, completeNodeEditing } = useActions();
 
   const [{ isBeforeOver }, refDropToBefore] = useDrop({
     accept: 'node',
@@ -45,6 +45,10 @@ function NodeElement(props: { nodeId: string }) {
     setTmpName(name);
   };
 
+  const onBlur = () => {
+    completeNodeEditing();
+  };
+
   let children: JSX.Element | null = null;
   if (node.children.length > 0) {
     children = (
@@ -56,8 +60,8 @@ function NodeElement(props: { nodeId: string }) {
     );
   }
 
-  const backgroundBefore = isBeforeOver ? '#eee': 'white';
-  const backgroundNode = isNodeOver ? '#eee': 'white';
+  const backgroundBefore = isBeforeOver ? '#eee' : 'white';
+  const backgroundNode = isNodeOver ? '#eee' : 'white';
 
   return (
     <li
@@ -66,7 +70,7 @@ function NodeElement(props: { nodeId: string }) {
       }}
     >
       {props.nodeId === state.editingId ? (
-        <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} />
+        <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} onBlur={onBlur} />
       ) : (
         <>
           <p
@@ -74,13 +78,11 @@ function NodeElement(props: { nodeId: string }) {
             style={{
               backgroundColor: backgroundBefore,
               position: 'absolute',
-              top:'-33px',
+              top: '-33px',
               width: '100%',
-              height: '16px'
+              height: '16px',
             }}
-          >
-             
-          </p>
+          ></p>
           <p
             ref={refDropToChild}
             onClick={onClick}
