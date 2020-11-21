@@ -31,7 +31,6 @@ function NodeSvgElement(props: { nodeId: string }) {
     item: { type: 'node' },
     begin: () => dragNode(node.id),
     end: (_, monitor) => {
-      console.log('didDrop=' + monitor.didDrop());
       if (!monitor.didDrop()) {
         dragNode(null);
       }
@@ -87,6 +86,7 @@ function NodeSvgElement(props: { nodeId: string }) {
       ) : (
         <>
           <text
+            style={{ userSelect: 'none' }}
             onClick={onClick}
             onDoubleClick={onDoubleClick}
             fill={props.nodeId === state.selectingId ? 'cyan' : textColor}

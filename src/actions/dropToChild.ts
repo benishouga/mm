@@ -4,9 +4,6 @@ import { pushHistory } from './pushHistory';
 import { collectChildrenIds } from './utils';
 
 export const dropToChild = (state: AppState, nodeId: string) => {
-  console.log(state.draggingId);
-  console.log(nodeId);
-
   const draggingId = state.draggingId;
 
   if (!draggingId || draggingId === nodeId) {
@@ -17,7 +14,6 @@ export const dropToChild = (state: AppState, nodeId: string) => {
 
   return pushHistory(
     produce(state, (draft) => {
-      console.log('ChildrenIds:' + JSON.stringify(collectChildrenIds(draft.idMap[draggingId], draft), null, ' '));
       draft.draggingId = null;
       const draggingNode = draft.idMap[draggingId];
       if (collectChildrenIds(draggingNode, draft).indexOf(nodeId) !== -1) {
@@ -36,16 +32,10 @@ export const dropToChild = (state: AppState, nodeId: string) => {
       }
 
       const index = parentOfDraggingNode.children.indexOf(draggingId);
-      console.log('DraggingParentChildren:' + JSON.stringify(parentOfDraggingNode.children, null, ' '));
-      console.log('ChildrenToInsert:' + JSON.stringify(nodeToInsert.children, null, ' '));
-
       parentOfDraggingNode.children.splice(index, 1);
 
       nodeToInsert.children.push(draggingId);
       draggingNode.parent = nodeId;
-
-      console.log('After parentOfDraggingNode' + JSON.stringify(parentOfDraggingNode.children, null, ' '));
-      console.log('After Children:' + JSON.stringify(nodeToInsert.children, null, ' '));
     })
   );
 };

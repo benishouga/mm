@@ -33,7 +33,7 @@ export const addSiblingNode = (state: AppState, _name: string) => {
       draft.tmpName = name;
       draft.idMap[parentId].children.splice(index + 1, 0, newId);
       draft.idMap[newId] = {
-        name: newId,
+        name,
         children: [],
         parent: parentId,
         id: newId,

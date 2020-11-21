@@ -143,7 +143,7 @@ function App() {
       if (!isScrolling) return;
       const diffX = scrollStartMousePosition.x - event.pageX;
       const diffY = scrollStartMousePosition.y - event.pageY;
-      if (diffY ** 2 + diffY ** 2 < 25) return;
+      if (diffY ** 2 + diffY ** 2 < 9) return;
       const x = scrollStartPosition.x + diffX;
       const y = scrollStartPosition.y + diffY;
       setScrollPosition({ x, y });
@@ -175,7 +175,6 @@ function App() {
     }, [mmAreaRef.current]);
 
     const onMouseDown = (event: React.MouseEvent) => {
-      console.log('Scrolling start');
       setIsScrolling(true);
       setScrollStartPosition(scrollPosition);
       setScrollStartMousePosition({ x: event.pageX, y: event.pageY });
