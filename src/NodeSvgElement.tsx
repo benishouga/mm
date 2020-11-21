@@ -6,10 +6,14 @@ import { calculatedAppState, useActions, Geometry } from './state';
 import LineSvgElement from './LineSvgElement';
 
 import { getTextWidth } from './actions/utils';
+import { useAutoFocus } from './hooks';
 
 function NodeSvgElement(props: { nodeId: string }) {
   const state = useRecoilValue(calculatedAppState);
   const node = state.idMap[props.nodeId];
+
+  const inputRef = useAutoFocus<HTMLInputElement>();
+
 
   const { editNode, setTmpName, selectNode, dragNode, dropToBefore, dropToChild } = useActions();
 
@@ -81,7 +85,7 @@ function NodeSvgElement(props: { nodeId: string }) {
           width="100%"
           height={geometry.height}
         >
-          <input type="text" value={state.tmpName || ''} onChange={onChange} />
+          <input type="text" value={state.tmpName || ''} onChange={onChange} ref={inputRef} />
         </foreignObject>
       ) : (
         <>
