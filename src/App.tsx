@@ -127,9 +127,7 @@ function App() {
     }
 
     function mouseUpHandler(_: MouseEvent) {
-      if (isScrolling) {
-        setIsScrolling(false);
-      }
+      setIsScrolling(false);
     }
 
     useEffect(() => {
@@ -143,8 +141,11 @@ function App() {
 
     function mouseMoveHandler(event: MouseEvent) {
       if (!isScrolling) return;
-      const x = scrollStartPosition.x + scrollStartMousePosition.x - event.pageX;
-      const y = scrollStartPosition.y + scrollStartMousePosition.y - event.pageY;
+      const diffX = scrollStartMousePosition.x - event.pageX;
+      const diffY = scrollStartMousePosition.y - event.pageY;
+      if (diffY ** 2 + diffY ** 2 < 25) return;
+      const x = scrollStartPosition.x + diffX;
+      const y = scrollStartPosition.y + diffY;
       setScrollPosition({ x, y });
     }
 
@@ -154,6 +155,10 @@ function App() {
         window.removeEventListener('keydown', keyDownHandler);
       };
     }, [state]);
+
+    useEffect(() => {
+      if (state.draggingId) setIsScrolling(false);
+    }, [state.draggingId]);
 
     useEffect(() => {
       function handleResize() {
@@ -170,6 +175,7 @@ function App() {
     }, [mmAreaRef.current]);
 
     const onMouseDown = (event: React.MouseEvent) => {
+      console.log('Scrolling start');
       setIsScrolling(true);
       setScrollStartPosition(scrollPosition);
       setScrollStartMousePosition({ x: event.pageX, y: event.pageY });
