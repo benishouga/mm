@@ -8,5 +8,6 @@ export const pushHistory = (state: AppState) => {
     history.splice(currentIndex + 1, history.length - currentIndex - 1);
     history.push(state.idMap);
     draft.idMapHistory.currentIndex++;
+    draft.isDirty = true;
   });
 };

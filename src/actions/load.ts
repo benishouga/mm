@@ -16,7 +16,13 @@ export const load = async (state: AppState, mmid: string) => {
 
   if (!data) {
     return produce(state, (draft) => {
-      draft.idMap =initialIdMap;
+      draft.mmid = mmid;
+      draft.idMap = initialIdMap;
+      draft.idMapHistory = {
+        history: [initialIdMap],
+        currentIndex: 0,
+      };
+      draft.isDirty = false;
     });
   }
 
@@ -28,7 +34,14 @@ export const load = async (state: AppState, mmid: string) => {
         parent: data[key].parent || null,
       })
   );
+
   return produce(state, (draft) => {
+    draft.mmid = mmid;
     draft.idMap = data;
+    draft.idMapHistory = {
+      history: [data],
+      currentIndex: 0,
+    };
+    draft.isDirty = false;
   });
 };

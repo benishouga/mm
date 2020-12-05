@@ -54,6 +54,7 @@ export type IdMapHistory = {
 };
 
 export type AppState = {
+  mmid: string;
   idMap: IdMap;
   idMapHistory: IdMapHistory;
   selectingId: string | null;
@@ -61,6 +62,7 @@ export type AppState = {
   draggingId: string | null;
   tmpName: string | null;
   viewMode: 'bulletList' | 'mindMap';
+  isDirty: boolean;
 };
 
 export const initialIdMap = {
@@ -79,12 +81,14 @@ export const appState = atom<AppState>({
       history: [initialIdMap],
       currentIndex: 0,
     },
+    mmid: '',
     idMap: initialIdMap,
     selectingId: null,
     editingId: null,
     draggingId: null,
     tmpName: null,
     viewMode: 'mindMap',
+    isDirty: false,
   },
 });
 

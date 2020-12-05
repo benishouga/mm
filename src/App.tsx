@@ -93,6 +93,28 @@ function App() {
     }, [state]);
 
     useEffect(() => {
+      console.log('history len(hash)=' + state.idMapHistory.history.length);
+      console.log('hash=' + hash);
+      console.log('prev=' + state.mmid);
+      // ■パターン
+      // 新規ロード(ハッシュなし)
+      // 新規ロード(ハッシュあり)
+      // リロード（ハッシュなし）
+      // リロード（ハッシュあり）
+      // ハッシュなし→ハッシュあり
+      // ハッシュあり→ハッシュなし
+      // ハッシュあり→ハッシュあり（別ページ）
+      // ハッシュなし→別ページ
+      // ハッシュあり→別ページ
+      // History Back(ハッシュなし)
+      // History Back(ハッシュあり)
+      // History Forward(ハッシュなし)
+      // History Forward(ハッシュあり)
+      if (state.isDirty && !confirm('今の消えちゃうよ？')) {
+        setHash(state.mmid || '');
+        return;
+      }
+
       let mmid = hash;
       if (mmid) {
         console.log(mmid);
@@ -108,6 +130,21 @@ function App() {
       }
       save(mmid);
     };
+
+    useEffect(() => {
+      const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+        console.log('history len(BeforeUnloadEvent)=' + state.idMapHistory.history.length);
+        if (state.isDirty) {
+          e.preventDefault();
+          e.returnValue = 'Exit?';
+          return 'Exit?';
+        }
+      };
+      window.addEventListener('beforeunload', beforeUnloadHandler);
+      return () => {
+        window.removeEventListener('beforeunload', beforeUnloadHandler);
+      };
+    }, [state]);
 
     return (
       <div className="App">

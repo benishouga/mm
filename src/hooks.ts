@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 // https://qiita.com/seya/items/fd8b49e5c79d471d62e4
 export function useAutoFocus<RefType extends HTMLInputElement>(deps: any[] = []) {
-  const inputRef = React.useRef<RefType>(null);
+  const inputRef = useRef<RefType>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const node = inputRef.current;
     if (node) {
       node.focus();
@@ -15,7 +15,7 @@ export function useAutoFocus<RefType extends HTMLInputElement>(deps: any[] = [])
   return inputRef;
 }
 
-export const useHash = () => {
+export function useHash() {
   const [hash, setHash] = useState(() => window.location.hash.replace(/^#/, ''));
 
   const onHashChange = useCallback(() => {
@@ -39,4 +39,4 @@ export const useHash = () => {
   );
 
   return [hash, _setHash] as const;
-};
+}
