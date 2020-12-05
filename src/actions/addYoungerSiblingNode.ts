@@ -32,6 +32,7 @@ export const addYoungerSiblingNode = (state: AppState, _name: string) => {
       const name = newId.slice(0, 4);
       draft.tmpName = name;
       draft.cacheMap = state.idMap;
+      draft.cacheSelectingId = state.selectingId;
       draft.idMap[parentId].children.splice(index + 1, 0, newId);
       draft.idMap[newId] = {
         name,

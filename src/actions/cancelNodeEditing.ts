@@ -13,29 +13,17 @@ export const cancelNodeEditing = (state: AppState) => {
       return state;
     }
 
-    const parent = state.idMap[parentId];
-    const selectingNodeIndex = parent.children.indexOf(selectingId);
-
-    let nextSelectingNode: string;
-
-    if (parent.children.length === 1) {
-      nextSelectingNode = parentId;
-    } else {
-      if (selectingNodeIndex === 0) {
-        nextSelectingNode = parent.children[selectingNodeIndex + 1];
-      } else {
-        nextSelectingNode = parent.children[selectingNodeIndex - 1];
-      }
-    }
-
     return produce(state, (draft) => {
       if (draft.cacheMap) {
         draft.idMap = draft.cacheMap;
       }
+      if (draft.cacheSelectingId) {
+        draft.selectingId = draft.cacheSelectingId;
+      }
 
-      draft.selectingId = nextSelectingNode;
       draft.editingId = null;
       draft.cacheMap = null;
+      draft.cacheSelectingId = null;
     });
   }
 

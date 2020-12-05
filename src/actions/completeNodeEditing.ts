@@ -10,9 +10,6 @@ export const completeNodeEditing = (state: AppState) => {
     return state;
   }
 
-  console.log(editingId)
-  console.log(state.idMap)
-
   if (state.idMap[editingId].name === tmpName) {
     const newState = { ...state };
     newState.editingId = null;
@@ -22,6 +19,7 @@ export const completeNodeEditing = (state: AppState) => {
       produce(state, (draft) => {
         draft.editingId = null;
         draft.cacheMap = null;
+        draft.cacheSelectingId = null;
         draft.idMap[editingId].name = tmpName;
       })
     );

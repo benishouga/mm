@@ -24,6 +24,7 @@ export const addNewNode = (state: AppState, _name: string) => {
       const name = newId.slice(0, 4);
       draft.tmpName = name;
       draft.cacheMap = state.idMap;
+      draft.cacheSelectingId = state.selectingId;
       draft.idMap[selectingId].children.push(newId);
       draft.idMap[newId] = {
         name,

@@ -18,6 +18,7 @@ function App() {
     const {
       completeNodeEditing,
       addNewNode,
+      addParentNode,
       addYoungerSiblingNode,
       addOlderSiblingNode,
       deleteNode,
@@ -52,7 +53,11 @@ function App() {
         }
       } else if (key === 'Insert' || key === 'Tab') {
         event.preventDefault();
-        addNewNode();
+        if (event.shiftKey) {
+          addParentNode();
+        } else {
+          addNewNode();
+        }
       } else if (key === 'Delete') {
         if (state.editingId) {
           return;
@@ -98,9 +103,6 @@ function App() {
     }, [state]);
 
     useEffect(() => {
-      console.log('history len(hash)=' + state.idMapHistory.history.length);
-      console.log('hash=' + hash);
-      console.log('prev=' + state.mmid);
       // ■パターン
       // 新規ロード(ハッシュなし)
       // 新規ロード(ハッシュあり)
@@ -138,7 +140,6 @@ function App() {
 
     useEffect(() => {
       const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
-        console.log('history len(BeforeUnloadEvent)=' + state.idMapHistory.history.length);
         if (state.isDirty) {
           e.preventDefault();
           e.returnValue = 'Exit?';

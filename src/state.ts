@@ -4,6 +4,7 @@ import { cancelNodeEditing } from './actions/cancelNodeEditing';
 import { addYoungerSiblingNode } from './actions/addYoungerSiblingNode';
 import { addOlderSiblingNode } from './actions/addOlderSiblingNode';
 import { addNewNode } from './actions/addNewNode';
+import { addParentNode } from './actions/addParentNode';
 import { deleteNode } from './actions/deleteNode';
 import { editNode } from './actions/editNode';
 import { selectNode } from './actions/selectNode';
@@ -63,6 +64,7 @@ export type AppState = {
   draggingId: string | null;
   tmpName: string | null;
   cacheMap: IdMap | null;
+  cacheSelectingId: string | null;
   viewMode: 'bulletList' | 'mindMap';
   isDirty: boolean;
 };
@@ -90,6 +92,7 @@ export const appState = atom<AppState>({
     draggingId: null,
     tmpName: null,
     cacheMap: null,
+    cacheSelectingId: null,
     viewMode: 'mindMap',
     isDirty: false,
   },
@@ -129,6 +132,10 @@ export const useActions = () => {
 
     addNewNode: () => {
       setState(addNewNode(state, DEFAULT_NAME));
+    },
+
+    addParentNode: () => {
+      setState(addParentNode(state, DEFAULT_NAME));
     },
 
     deleteNode: () => {

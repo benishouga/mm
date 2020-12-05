@@ -3,15 +3,16 @@ import { AppState } from '../state';
 import { v4 as uuidv4 } from 'uuid';
 import { pushHistory } from './pushHistory';
 
-export const addOlderSiblingNode = (state: AppState, _name: string) => {
-  const selectingId = state.selectingId;
+export const addParentNode = (state: AppState, _name: string) => {
+  const editingId = state.editingId;
+  const tmpName = state.tmpName || '';
 
+  const selectingId = state.selectingId;
   if (!selectingId) {
     return state;
   }
 
   const parentId = state.idMap[selectingId].parent;
-
   if (!parentId) {
     return state;
   }
@@ -20,23 +21,21 @@ export const addOlderSiblingNode = (state: AppState, _name: string) => {
 
   const index = state.idMap[parentId].children.indexOf(selectingId);
 
-  if (index == -1) {
-    console.error('wtf state!');
-    return state;
-  }
-
   return pushHistory(
     produce(state, (draft) => {
+      if (editingId) {
+        draft.idMap[editingId].name = tmpName;
+      }
       draft.selectingId = newId;
       draft.editingId = newId;
       const name = newId.slice(0, 4);
       draft.tmpName = name;
       draft.cacheMap = state.idMap;
       draft.cacheSelectingId = state.selectingId;
-      draft.idMap[parentId].children.splice(index, 0, newId);
+      draft.idMap[parentId].children[index] = newId;
       draft.idMap[newId] = {
         name,
-        children: [],
+        children: [selectingId],
         parent: parentId,
         id: newId,
       };
