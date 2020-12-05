@@ -61,6 +61,7 @@ export type AppState = {
   editingId: string | null;
   draggingId: string | null;
   tmpName: string | null;
+  cacheMap: IdMap | null;
   viewMode: 'bulletList' | 'mindMap';
   isDirty: boolean;
 };
@@ -83,10 +84,11 @@ export const appState = atom<AppState>({
     },
     mmid: '',
     idMap: initialIdMap,
-    selectingId: null,
+    selectingId: 'root',
     editingId: null,
     draggingId: null,
     tmpName: null,
+    cacheMap: null,
     viewMode: 'mindMap',
     isDirty: false,
   },
