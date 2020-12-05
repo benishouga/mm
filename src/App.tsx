@@ -18,7 +18,8 @@ function App() {
     const {
       completeNodeEditing,
       addNewNode,
-      addSiblingNode,
+      addYoungerSiblingNode,
+      addOlderSiblingNode,
       deleteNode,
       cancelNodeEditing,
       editNode,
@@ -43,7 +44,11 @@ function App() {
         if (editingId) {
           completeNodeEditing();
         } else {
-          addSiblingNode();
+          if (event.shiftKey) {
+            addOlderSiblingNode();
+          } else {
+            addYoungerSiblingNode();
+          }
         }
       } else if (key === 'Insert' || key === 'Tab') {
         event.preventDefault();

@@ -3,7 +3,7 @@ import { AppState } from '../state';
 import { v4 as uuidv4 } from 'uuid';
 import { pushHistory } from './pushHistory';
 
-export const addSiblingNode = (state: AppState, _name: string) => {
+export const addYoungerSiblingNode = (state: AppState, _name: string) => {
   const selectingId = state.selectingId;
 
   if (!selectingId) {

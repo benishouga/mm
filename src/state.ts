@@ -1,7 +1,8 @@
 import { atom, useRecoilState, selector, useRecoilValue } from 'recoil';
 import { completeNodeEditing } from './actions/completeNodeEditing';
 import { cancelNodeEditing } from './actions/cancelNodeEditing';
-import { addSiblingNode } from './actions/addSiblingNode';
+import { addYoungerSiblingNode } from './actions/addYoungerSiblingNode';
+import { addOlderSiblingNode } from './actions/addOlderSiblingNode';
 import { addNewNode } from './actions/addNewNode';
 import { deleteNode } from './actions/deleteNode';
 import { editNode } from './actions/editNode';
@@ -118,8 +119,12 @@ export const useActions = () => {
       setState(cancelNodeEditing(state));
     },
 
-    addSiblingNode: () => {
-      setState(addSiblingNode(state, DEFAULT_NAME));
+    addYoungerSiblingNode: () => {
+      setState(addYoungerSiblingNode(state, DEFAULT_NAME));
+    },
+
+    addOlderSiblingNode: () => {
+      setState(addOlderSiblingNode(state, DEFAULT_NAME));
     },
 
     addNewNode: () => {
