@@ -2,3 +2,5 @@ node_modules
 public/main.js
 src/.*.ts
 .DS_Store
+*.log
+.firebase/*
