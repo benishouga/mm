@@ -26,6 +26,7 @@ import produce from 'immer';
 import { switchView } from './actions/switchView';
 import { selectOverSameDepthNode } from './actions/selectOverSameDepthNode';
 import { selectUnderSameDepthNode } from './actions/selectUnderSameDepthNode';
+import { pasteNode } from './actions/pasteNode';
 
 export type IdMap = {
   root: MmNode;
@@ -213,5 +214,10 @@ export const useActions = () => {
     switchView: () => {
       setState(switchView(state));
     },
+    
+    pasteNode: (plainText: string) => {
+      setState(pasteNode(state, plainText));
+    },
+
   };
 };

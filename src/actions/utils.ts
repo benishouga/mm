@@ -1,4 +1,4 @@
-import { MmNode, AppState } from '../state';
+import { MmNode, AppState, IdMap } from '../state';
 
 export function collectChildrenIds(tree: MmNode, state: AppState) {
   let ids = [tree.id];
@@ -101,4 +101,18 @@ export const getTextWidth = (() => {
 
 export const getTextHeight = (_text: string) => {
   return 30;
+};
+
+export const convertIdMapToPlainText = (nodeId: string, idMap: IdMap, depth = 0) => {
+
+  const copyNode = idMap[nodeId]
+
+  const indent = "\t".repeat(depth) 
+  let plainText = indent + copyNode.name + '\n'
+
+  copyNode.children.forEach((id) => {
+    plainText += convertIdMapToPlainText(id, idMap, depth + 1)
+  })
+  
+  return plainText;
 };

@@ -9,6 +9,7 @@ import { appState, useActions } from './state';
 import BulletList from './BulletList';
 import MindMap from './MindMap';
 import { useHash } from './hooks';
+import { convertIdMapToPlainText } from './actions/utils';
 
 function App() {
   function InnerApp() {
@@ -30,9 +31,32 @@ function App() {
       save,
       load,
       switchView,
+      pasteNode,
     } = useActions();
 
     const headerRef = useRef<HTMLDivElement>(null);
+
+    function copyHandler() {
+      if (!state.selectingId) {
+        return;
+      }
+
+      const plainText = convertIdMapToPlainText(state.selectingId, state.idMap);
+
+      navigator.clipboard.writeText(plainText).then(function () {
+        console.log('complete copy');
+      });
+    }
+
+    async function pasteHandler() {
+      if (!state.selectingId) {
+        return;
+      }
+
+      const plainText = await navigator.clipboard.readText();
+
+      pasteNode(plainText);
+    }
 
     function keyDownHandler(event: KeyboardEvent) {
       const key = event.key;
@@ -97,8 +121,12 @@ function App() {
 
     useEffect(() => {
       window.addEventListener('keydown', keyDownHandler);
+      document.addEventListener('copy', copyHandler);
+      document.addEventListener('paste', pasteHandler);
       return () => {
         window.removeEventListener('keydown', keyDownHandler);
+        document.removeEventListener('copy', copyHandler);
+        document.removeEventListener('paste', pasteHandler);
       };
     }, [state]);
 
