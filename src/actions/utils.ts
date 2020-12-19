@@ -98,3 +98,7 @@ export const getTextWidth = (() => {
     }
   };
 })();
+
+export const getTextHeight = (_text: string) => {
+  return 30;
+};

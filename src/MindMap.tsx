@@ -1,10 +1,11 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import NodeSvgElement from './NodeSvgElement';
-import { appState, useActions } from './state';
+import { useActions, calculatedAppState } from './state';
+import { getTextWidth, getTextHeight } from './actions/utils';
 
 function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
-  const [state] = useRecoilState(appState);
+  const state = useRecoilValue(calculatedAppState);
   const [mindMapAreaSize, setMindMapAreaSize] = useState({ width: 500, height: 800 });
   const [isScrolling, setIsScrolling] = useState(false);
   const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
@@ -93,6 +94,44 @@ function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
   useEffect(() => {
     if (state.draggingId) setIsScrolling(false);
   }, [state.draggingId]);
+
+  useEffect(() => {
+    if (!state.selectingId) {
+      return;
+    }
+    const selectingNode = state.idMap[state.selectingId];
+    const geometry = selectingNode.ephemeral?.geometry;
+    if (!geometry) return;
+
+    const viewPort = {
+      top: scrollPosition.y,
+      left: scrollPosition.x,
+      bottom: scrollPosition.y + mindMapAreaSize.height,
+      right: scrollPosition.x + mindMapAreaSize.width,
+    };
+
+    const scroll = { ...scrollPosition };
+    const actualHeight = getTextHeight(selectingNode.name);
+    const actualTop = geometry.top - actualHeight / 2;
+    if (viewPort.top > actualTop) {
+      scroll.y = actualTop;
+    }
+
+    const actualBottom = geometry.top + actualHeight / 2;
+    if (viewPort.bottom < actualBottom) {
+      scroll.y = actualBottom - mindMapAreaSize.height;
+    }
+
+    if (viewPort.left > geometry.left) {
+      scroll.x = geometry.left;
+    }
+
+    const actualWidth = getTextWidth(selectingNode.name);
+    if (viewPort.right < geometry.left) {
+      scroll.x = geometry.left + actualWidth - mindMapAreaSize.width;
+    }
+    setScrollPosition(scroll);
+  }, [state.selectingId]);
 
   const onMouseDown = (event: React.MouseEvent) => {
     setIsScrolling(true);
