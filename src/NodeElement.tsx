@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useRef, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { useDrop, useDrag } from 'react-dnd';
 
@@ -9,8 +9,14 @@ function NodeElement(props: { nodeId: string }) {
   const [state] = useRecoilState(appState);
   const node = state.idMap[props.nodeId];
   const inputRef = useAutoFocus<HTMLInputElement>([state.editingId]);
-
+  const textRef = useRef<HTMLElement>(null);
   const { editNode, selectNode, setTmpName, dropToBefore, dropToChild, dragNode, completeNodeEditing } = useActions();
+
+  useEffect(() => {
+    if (node.id === state.selectingId) {
+      textRef.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+  }, [state.selectingId]);
 
   const [{ isBeforeOver }, refDropToBefore] = useDrop({
     accept: 'node',
@@ -91,7 +97,9 @@ function NodeElement(props: { nodeId: string }) {
               backgroundColor: props.nodeId === state.selectingId ? 'cyan' : backgroundNode,
             }}
           >
-            <span ref={drag}>{node.name}</span>
+            <span ref={drag}>
+              <span ref={textRef}>{node.name}</span>
+            </span>
           </p>
         </>
       )}

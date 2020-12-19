@@ -153,7 +153,7 @@ function App() {
     }, [state]);
 
     return (
-      <div className="App">
+      <div className="App" style={{ display: 'inline-block' }}>
         <div ref={headerRef}>
           <button onClick={() => onSave()}>save</button>
           {/* <button onClick={() => load()}>load</button> */}
