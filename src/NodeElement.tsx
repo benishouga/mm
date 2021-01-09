@@ -89,16 +89,16 @@ function NodeElement(props: { nodeId: string }) {
               height: '16px',
             }}
           ></p>
-          <p
-            ref={refDropToChild}
-            onClick={onClick}
-            onDoubleClick={onDoubleClick}
-            style={{
-              backgroundColor: props.nodeId === state.selectingId ? 'cyan' : backgroundNode,
-            }}
-          >
+          <p ref={refDropToChild} onClick={onClick} onDoubleClick={onDoubleClick}>
             <span ref={drag}>
-              <span ref={textRef}>{node.name}</span>
+              <span
+                ref={textRef}
+                style={{
+                  backgroundColor: props.nodeId === state.selectingId ? 'cyan' : backgroundNode,
+                }}
+              >
+                {node.name}
+              </span>
             </span>
           </p>
         </>
