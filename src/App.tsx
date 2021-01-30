@@ -135,7 +135,10 @@ function App() {
         }
         event.preventDefault();
         redo();
-      }
+      }else if (key === 's' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        onSave();
+      } 
     }
 
     useEffect(() => {
