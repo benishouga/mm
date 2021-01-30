@@ -122,6 +122,12 @@ function App() {
           return;
         }
         editNode(state.selectingId, state.idMap[state.selectingId].name);
+      } else if (key === 'Backspace') {
+        event.preventDefault();
+        if (!state.selectingId) {
+          return;
+        }
+        editNode(state.selectingId, '');
       } else if (key === 'ArrowLeft') {
         if (state.editingId) {
           return;
