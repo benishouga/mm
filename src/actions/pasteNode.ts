@@ -1,5 +1,6 @@
 import { produce } from 'immer';
 import { AppState } from '../state';
+import { pushHistory } from './pushHistory';
 import { convertPlainTextToMmNodes } from './utils';
 
 export const pasteNode = (state: AppState, plaintext: string) => {
@@ -9,15 +10,17 @@ export const pasteNode = (state: AppState, plaintext: string) => {
 
   const mmNodes = convertPlainTextToMmNodes(plaintext);
 
-  return produce(state, (draft) => {
-    mmNodes.forEach((node) => {
-      if (!node.parent) {
-        node.parent = state.selectingId;
-        if (state.selectingId) {
-          draft.idMap[state.selectingId].children.push(node.id);
+  return pushHistory(
+    produce(state, (draft) => {
+      mmNodes.forEach((node) => {
+        if (!node.parent) {
+          node.parent = state.selectingId;
+          if (state.selectingId) {
+            draft.idMap[state.selectingId].children.push(node.id);
+          }
         }
-      }
-      draft.idMap[node.id] = node;
-    });
-  });
+        draft.idMap[node.id] = node;
+      });
+    })
+  );
 };
