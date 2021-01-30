@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import NodeElement from './NodeElement';
-import { appState, useActions } from './state';
+import { appState, useActions, ROOT_NODE_ID } from './state';
 
 function BulletList() {
   const [state] = useRecoilState(appState);
@@ -43,7 +43,7 @@ function BulletList() {
 
   return (
     <ul>
-      <NodeElement nodeId="root" />
+      <NodeElement nodeId={ROOT_NODE_ID} />
     </ul>
   );
 }

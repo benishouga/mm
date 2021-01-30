@@ -1,7 +1,7 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import NodeSvgElement from './NodeSvgElement';
-import { useActions, calculatedAppState } from './state';
+import { useActions, calculatedAppState, ROOT_NODE_ID } from './state';
 import { getTextWidth, getTextHeight } from './actions/utils';
 
 function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
@@ -28,6 +28,13 @@ function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
 
     return () => window.removeEventListener('resize', handleResize);
   }, [mmAreaRef.current]);
+
+  useEffect(() => {
+    const rootNode = state.idMap[ROOT_NODE_ID];
+    const nodeHeight = (rootNode.ephemeral?.geometry.height || 0) + 15;
+    const scrollY = (nodeHeight - mindMapAreaSize.height) / 2;
+    setScrollPosition({ x: 0, y: scrollY });
+  }, [state.mmid]);
 
   function keyDownHandler(event: KeyboardEvent) {
     const key = event.key;
@@ -146,7 +153,7 @@ function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
         width={mindMapAreaSize.width}
         height={mindMapAreaSize.height}
       >
-        <NodeSvgElement nodeId="root" />
+        <NodeSvgElement nodeId={ROOT_NODE_ID} />
       </svg>
     </div>
   );

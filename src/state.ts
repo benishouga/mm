@@ -70,12 +70,14 @@ export type AppState = {
   isDirty: boolean;
 };
 
+export const ROOT_NODE_ID = 'root';
+
 export const initialIdMap = {
   root: {
     name: 'root',
     children: [],
     parent: null,
-    id: 'root',
+    id: ROOT_NODE_ID,
   },
 };
 
@@ -88,7 +90,7 @@ export const appState = atom<AppState>({
     },
     mmid: '',
     idMap: initialIdMap,
-    selectingId: 'root',
+    selectingId: ROOT_NODE_ID,
     editingId: null,
     draggingId: null,
     tmpName: null,
@@ -103,7 +105,7 @@ export const calculatedAppState = selector({
   key: 'calculatedAppState',
   get: ({ get }) => {
     const state = produce(get(appState), (draft) => {
-      calculateNodeGeometry(draft.idMap['root'], draft);
+      calculateNodeGeometry(draft.idMap[ROOT_NODE_ID], draft);
     });
     return state;
   },
@@ -214,10 +216,9 @@ export const useActions = () => {
     switchView: () => {
       setState(switchView(state));
     },
-    
+
     pasteNode: (plainText: string) => {
       setState(pasteNode(state, plainText));
     },
-
   };
 };
