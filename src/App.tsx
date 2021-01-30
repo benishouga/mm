@@ -76,7 +76,7 @@ function App() {
     }
 
     function cutHandler() {
-      if (!state.selectingId) {
+      if (!state.selectingId || state.editingId) {
         return;
       }
       copyHandler();
