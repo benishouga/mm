@@ -62,9 +62,7 @@ function App() {
 
       const plainText = convertIdMapToPlainText(state.selectingId, state.idMap);
 
-      navigator.clipboard.writeText(plainText).then(function () {
-        console.log('complete copy');
-      });
+      navigator.clipboard.writeText(plainText);
     }
 
     async function pasteHandler() {
@@ -75,6 +73,14 @@ function App() {
       const plainText = await navigator.clipboard.readText();
 
       pasteNode(plainText);
+    }
+
+    function cutHandler() {
+      if (!state.selectingId) {
+        return;
+      }
+      copyHandler();
+      deleteNode();
     }
 
     function keyDownHandler(event: KeyboardEvent) {
@@ -135,20 +141,22 @@ function App() {
         }
         event.preventDefault();
         redo();
-      }else if (key === 's' && (event.ctrlKey || event.metaKey)) {
+      } else if (key === 's' && (event.ctrlKey || event.metaKey)) {
         event.preventDefault();
         onSave();
-      } 
+      }
     }
 
     useEffect(() => {
       window.addEventListener('keydown', keyDownHandler);
       document.addEventListener('copy', copyHandler);
       document.addEventListener('paste', pasteHandler);
+      document.addEventListener('cut', cutHandler);
       return () => {
         window.removeEventListener('keydown', keyDownHandler);
         document.removeEventListener('copy', copyHandler);
         document.removeEventListener('paste', pasteHandler);
+        document.removeEventListener('cut', cutHandler);
       };
     }, [state]);
 
@@ -174,7 +182,6 @@ function App() {
 
       let mmid = hash;
       if (mmid && userId) {
-        console.log(mmid);
         load(mmid);
       }
     }, [hash, userId]);
