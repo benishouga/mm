@@ -209,6 +209,25 @@ function App() {
       };
     }, [state]);
 
+    const showManual = () => {
+      alert(`操作説明
+Enter で 弟ノード を追加
+Shift + Enter で 兄ノード を追加
+Insert または Tab で 子ノード を追加
+Delete で 選択ノード 削除
+クリックで ノード を選択
+カーソルキー で 選択ノード を移動
+ダブルクリック または F2 で選択ノードの編集を開始
+編集中に Enter で 編集中ノード の編集を完了
+Escape で編集をキャンセル
+Ctrl + Z で 編集履歴 を戻る
+Ctrl + Y で 編集履歴 を進む
+Ctrl + C で コピー
+Ctrl + X で 切り取り
+Ctrl + V で 貼り付け
+Ctrl + S で 保存`);
+    };
+
     return (
       <div className="App">
         <div ref={headerRef}>
@@ -216,6 +235,8 @@ function App() {
           {/* <button onClick={() => load()}>load</button> */}
           &nbsp;|&nbsp;
           <button onClick={() => switchView()}>switch</button>
+          &nbsp;|&nbsp;
+          <button onClick={() => showManual()}>help</button>
         </div>
         {state.viewMode === 'bulletList' ? <BulletList /> : <MindMap headerRef={headerRef} />}
       </div>
