@@ -56,7 +56,7 @@ function App() {
     }, []);
 
     function copyHandler() {
-      if (!state.selectingId) {
+      if (!state.selectingId || state.editingId) {
         return;
       }
 
@@ -68,7 +68,7 @@ function App() {
     }
 
     async function pasteHandler() {
-      if (!state.selectingId) {
+      if (!state.selectingId || state.editingId) {
         return;
       }
 
