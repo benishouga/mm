@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import firebase from 'firebase';
 
 import { v4 as uuidv4 } from 'uuid';
 import './config';
@@ -15,6 +16,7 @@ function App() {
   function InnerApp() {
     const [state] = useRecoilState(appState);
     const [hash, setHash] = useHash();
+    const [userId, setUserId] = useState<string | null>(null);
 
     const {
       completeNodeEditing,
@@ -35,6 +37,23 @@ function App() {
     } = useActions();
 
     const headerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      firebase
+        .auth()
+        .signInAnonymously()
+        .then((userCredential) => {
+          console.log('sign in success');
+          if (userCredential.user) {
+            setUserId(userCredential.user.uid);
+          } else {
+            console.error('wtf userCredential.user');
+          }
+        })
+        .catch((error) => {
+          console.error(error.code, error.message);
+        });
+    }, []);
 
     function copyHandler() {
       if (!state.selectingId) {
@@ -151,11 +170,11 @@ function App() {
       }
 
       let mmid = hash;
-      if (mmid) {
+      if (mmid && userId) {
         console.log(mmid);
         load(mmid);
       }
-    }, [hash]);
+    }, [hash, userId]);
 
     const onSave = () => {
       let mmid = hash;
