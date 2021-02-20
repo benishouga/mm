@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useDrop, useDrag, DragPreviewImage } from 'react-dnd';
 
@@ -13,6 +13,8 @@ function NodeSvgElement(props: { nodeId: string }) {
   const node = state.idMap[props.nodeId];
 
   const inputRef = useAutoFocus<HTMLInputElement>([state.editingId]);
+
+  const [isHover, setIsHover] = useState(false);
 
   const { editNode, setTmpName, selectNode, dragNode, dropToBefore, dropToChild, completeNodeEditing } = useActions();
 
@@ -46,6 +48,15 @@ function NodeSvgElement(props: { nodeId: string }) {
 
   const onDoubleClick = () => {
     editNode(props.nodeId, node.name);
+    setIsHover(false);
+  };
+
+  const onMouseEnter = () => {
+    setIsHover(true);
+  };
+
+  const onMouseLeave = () => {
+    setIsHover(false);
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -94,8 +105,6 @@ function NodeSvgElement(props: { nodeId: string }) {
         <>
           <text
             style={{ userSelect: 'none' }}
-            onClick={onClick}
-            onDoubleClick={onDoubleClick}
             fill={props.nodeId === state.selectingId ? 'cyan' : textColor}
             x={geometry.left}
             y={geometry.calculatingTop + geometry.height / 2 + 5}
@@ -138,12 +147,15 @@ function NodeSvgElement(props: { nodeId: string }) {
                   ref={drag}
                   onClick={onClick}
                   onDoubleClick={onDoubleClick}
+                  onMouseEnter={onMouseEnter}
+                  onMouseLeave={onMouseLeave}
                   style={{
                     position: 'absolute',
                     top: '10px',
                     opacity: 0.5,
                     width: nodeWidth,
                     height: '20px',
+                    background: isHover ? 'yellow' : 'inherit',
                   }}
                 />
               </>

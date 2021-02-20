@@ -93,7 +93,7 @@ export const getTextWidth = (() => {
   const context = document.createElement('canvas').getContext('2d');
   return function getTextWidth(text: string) {
     if (context) {
-      return context.measureText(text).width * 1.8;
+      return Math.max(context.measureText(text).width * 1.8, 40);
     } else {
       return 0;
     }
