@@ -3,6 +3,8 @@ import { AppState } from '../state';
 import { v4 as uuidv4 } from 'uuid';
 import { pushHistory } from './pushHistory';
 
+const isProduct = process.env.NODE_ENV === 'production';
+
 export const addNewNode = (state: AppState, _name: string) => {
   const editingId = state.editingId;
   const tmpName = state.tmpName || '';
@@ -21,7 +23,8 @@ export const addNewNode = (state: AppState, _name: string) => {
       }
       draft.selectingId = newId;
       draft.editingId = newId;
-      const name = newId.slice(0, 4);
+      console.log(process.env.NODE_ENV);
+      const name = isProduct ? '' : newId.slice(0, 4);
       draft.tmpName = name;
       draft.cacheMap = state.idMap;
       draft.cacheSelectingId = state.selectingId;
