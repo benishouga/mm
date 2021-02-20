@@ -52,7 +52,7 @@ export type Geometry = {
 };
 
 export type IdMapHistory = {
-  history: IdMap[];
+  history: { idMap: IdMap; selectingId: string | null }[];
   currentIndex: number;
 };
 
@@ -85,7 +85,7 @@ export const appState = atom<AppState>({
   key: 'appState',
   default: {
     idMapHistory: {
-      history: [initialIdMap],
+      history: [{ idMap: initialIdMap, selectingId: ROOT_NODE_ID }],
       currentIndex: 0,
     },
     mmid: '',

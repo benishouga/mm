@@ -7,6 +7,8 @@ export const undo = (state: AppState) => {
   }
   return produce(state, (draft) => {
     draft.idMapHistory.currentIndex--;
-    draft.idMap = state.idMapHistory.history[draft.idMapHistory.currentIndex];
+    const history = state.idMapHistory.history[draft.idMapHistory.currentIndex];
+    draft.idMap = history.idMap;
+    draft.selectingId = history.selectingId;
   });
 };

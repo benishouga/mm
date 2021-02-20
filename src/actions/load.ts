@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { AppState, IdMap, initialIdMap } from '../state';
+import { AppState, IdMap, initialIdMap, ROOT_NODE_ID } from '../state';
 import firebase from 'firebase/app';
 import 'firebase/database';
 
@@ -20,7 +20,7 @@ export const load = async (state: AppState, mmid: string) => {
       draft.mmid = mmid;
       draft.idMap = initialIdMap;
       draft.idMapHistory = {
-        history: [initialIdMap],
+        history: [{ idMap: initialIdMap, selectingId: ROOT_NODE_ID }],
         currentIndex: 0,
       };
       draft.isDirty = false;
@@ -40,9 +40,10 @@ export const load = async (state: AppState, mmid: string) => {
     draft.mmid = mmid;
     draft.idMap = data;
     draft.idMapHistory = {
-      history: [data],
+      history: [{ idMap: data, selectingId: ROOT_NODE_ID }],
       currentIndex: 0,
     };
+    draft.selectingId = ROOT_NODE_ID;
     draft.isDirty = false;
   });
 };
