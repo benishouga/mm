@@ -1,6 +1,7 @@
 import { produce } from 'immer';
 import { AppState, IdMap, initialIdMap } from '../state';
-import firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/database';
 
 export const load = async (state: AppState, mmid: string) => {
   const ref = firebase.database().ref(`/mmm/${mmid}`);

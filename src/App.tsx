@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 import { v4 as uuidv4 } from 'uuid';
 import './config';
