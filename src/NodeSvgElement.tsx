@@ -6,7 +6,7 @@ import { calculatedAppState, useActions, Geometry } from './state';
 import LineSvgElement from './LineSvgElement';
 
 import { getTextWidth } from './actions/utils';
-import { useAutoFocus } from './hooks';
+import { useAutoFocus, usePrefersDarkMode } from './hooks';
 
 function NodeSvgElement(props: { nodeId: string }) {
   const state = useRecoilValue(calculatedAppState);
@@ -42,6 +42,8 @@ function NodeSvgElement(props: { nodeId: string }) {
     },
   });
 
+  const isDarkMode = usePrefersDarkMode();
+
   const onClick = () => {
     selectNode(props.nodeId);
   };
@@ -68,7 +70,7 @@ function NodeSvgElement(props: { nodeId: string }) {
     completeNodeEditing();
   };
 
-  const textColor = isNodeOver ? 'magenta' : 'black';
+  const textColor = isNodeOver ? 'magenta' : isDarkMode ? 'white' : 'black';
 
   let children: JSX.Element[] | null = null;
   if (node.children.length > 0) {

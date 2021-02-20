@@ -10,7 +10,7 @@ import './config';
 import { appState, useActions } from './state';
 import BulletList from './BulletList';
 import MindMap from './MindMap';
-import { useHash } from './hooks';
+import { useHash, usePrefersDarkMode } from './hooks';
 import { convertIdMapToPlainText } from './actions/utils';
 
 function App() {
@@ -18,6 +18,8 @@ function App() {
     const [state] = useRecoilState(appState);
     const [hash, setHash] = useHash();
     const [userId, setUserId] = useState<string | null>(null);
+
+    const isDarkMode = usePrefersDarkMode();
 
     const {
       completeNodeEditing,
@@ -192,6 +194,10 @@ function App() {
         load(mmid);
       }
     }, [hash, userId]);
+
+    useEffect(() => {
+      document.body.style.backgroundColor = isDarkMode ? '#222' : 'white';
+    }, [isDarkMode]);
 
     const onSave = () => {
       let mmid = hash;

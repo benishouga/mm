@@ -3,11 +3,14 @@ import { useRecoilValue } from 'recoil';
 
 import { calculatedAppState, Geometry } from './state';
 import { getTextWidth } from './actions/utils';
+import { usePrefersDarkMode } from './hooks';
 
 function LineSvgElement(props: { parentNodeId: string; childNodeId: string }) {
   const state = useRecoilValue(calculatedAppState);
   const parentNode = state.idMap[props.parentNodeId];
   const childNode = state.idMap[props.childNodeId];
+
+  const isDarkMode = usePrefersDarkMode();
 
   const parentGeometry: Geometry = parentNode.ephemeral?.geometry || {
     calculatingTop: 0,
@@ -35,7 +38,7 @@ function LineSvgElement(props: { parentNodeId: string; childNodeId: string }) {
       <path
         d={`M ${x1} ${y1} Q ${x1 + 10} ${y1}, ${(x2 - x1) / 2 + x1} ${(y2 - y1) / 2 + y1} T ${x2} ${y2}`}
         fill="none"
-        stroke="black"
+        stroke={isDarkMode ? 'white' : 'black'}
       />
     </>
   );

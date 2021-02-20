@@ -3,7 +3,7 @@ import { useRecoilState } from 'recoil';
 import { useDrop, useDrag } from 'react-dnd';
 
 import { appState, useActions } from './state';
-import { useAutoFocus } from './hooks';
+import { useAutoFocus, usePrefersDarkMode } from './hooks';
 
 function NodeElement(props: { nodeId: string }) {
   const [state] = useRecoilState(appState);
@@ -38,6 +38,8 @@ function NodeElement(props: { nodeId: string }) {
     begin: () => dragNode(node.id),
   });
 
+  const isDarkMode = usePrefersDarkMode();
+
   const onDoubleClick = () => {
     editNode(props.nodeId, node.name);
   };
@@ -66,8 +68,8 @@ function NodeElement(props: { nodeId: string }) {
     );
   }
 
-  const backgroundBefore = isBeforeOver ? '#eee' : 'white';
-  const backgroundNode = isNodeOver ? '#eee' : 'white';
+  const backgroundBefore = isBeforeOver ? '#eee' : isDarkMode ? '#222' : 'white';
+  const backgroundNode = isNodeOver ? '#eee' : isDarkMode ? '#222' : 'white';
 
   return (
     <li
@@ -95,6 +97,7 @@ function NodeElement(props: { nodeId: string }) {
                 ref={textRef}
                 style={{
                   backgroundColor: props.nodeId === state.selectingId ? 'cyan' : backgroundNode,
+                  color: isDarkMode ? 'white' : 'black',
                 }}
               >
                 {node.name}
