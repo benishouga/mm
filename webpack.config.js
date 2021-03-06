@@ -1,8 +1,25 @@
 const webpack = require('webpack');
 const dotenv = require('dotenv');
+const path = require('path');
+const fs = require('fs');
 
 const publidDir = __dirname + '/public';
-const env = dotenv.config().parsed;
+
+let env = dotenv.config().parsed;
+let specifiedEnvPath;
+if (process.env.NODE_ENV === 'production') {
+  specifiedEnvPath = path.resolve(process.cwd(), '.env.production');
+} else {
+  specifiedEnvPath = path.resolve(process.cwd(), '.env.development');
+}
+if (fs.existsSync(specifiedEnvPath)) {
+  env = {
+    ...env,
+    ...dotenv.config({
+      path: specifiedEnvPath,
+    }).parsed,
+  };
+}
 
 module.exports = {
   entry: ['./src/index.tsx'],

@@ -15,6 +15,7 @@ import { convertIdMapToPlainText } from './actions/utils';
 
 function App() {
   function InnerApp() {
+    console.log(process.env);
     const [state] = useRecoilState(appState);
     const [hash, setHash] = useHash();
     const [userId, setUserId] = useState<string | null>(null);

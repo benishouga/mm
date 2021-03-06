@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "cross-env NODE_ENV=production webpack --mode production",
     "format": "prettier --parser typescript --write  \"./src/**/*.ts\" \"./src/**/*.tsx\"",
     "start": "webpack-dev-server --content-base public --hot --open",
+    "dev": "concurrently \"npm run emulator\" \"npm start\"",
+    "emulator": "firebase emulators:start --only database --import=./.firebase_emulator_data --export-on-exit",
     "deploy": "npm run build && firebase deploy"
   },
   "repository": {
@@ -23,6 +25,7 @@
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "@types/uuid": "^8.0.0",
+    "concurrently": "^6.0.0",
     "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
     "firebase-tools": "^9.2.2",
@@ -35,7 +38,7 @@
   },
   "dependencies": {
     "@types/recoil": "0.0.1",
-    "firebase": "^7.22.0",
+    "firebase": "^8.2.10",
     "firebase-admin": "^9.2.0",
     "immer": "^7.0.5",
     "react": "^16.13.1",
