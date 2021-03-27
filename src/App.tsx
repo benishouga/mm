@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { RecoilRoot, useRecoilState } from 'recoil';
+import { RecoilRoot, useRecoilValue } from 'recoil';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import firebase from 'firebase/app';
@@ -7,7 +7,7 @@ import 'firebase/auth';
 
 import { v4 as uuidv4 } from 'uuid';
 import './config';
-import { appState, useActions } from './state';
+import { calculatedAppState, ROOT_NODE_ID, useActions } from './state';
 import BulletList from './BulletList';
 import MindMap from './MindMap';
 import { useHash, usePrefersDarkMode } from './hooks';
@@ -15,8 +15,7 @@ import { convertIdMapToPlainText } from './actions/utils';
 
 function App() {
   function InnerApp() {
-    console.log(process.env);
-    const [state] = useRecoilState(appState);
+    const state = useRecoilValue(calculatedAppState);
     const [hash, setHash] = useHash();
     const [userId, setUserId] = useState<string | null>(null);
 
@@ -41,13 +40,13 @@ function App() {
     } = useActions();
 
     const headerRef = useRef<HTMLDivElement>(null);
+    const mmSvgRef = useRef<SVGSVGElement>(null);
 
     useEffect(() => {
       firebase
         .auth()
         .signInAnonymously()
         .then((userCredential) => {
-          console.log('sign in success');
           if (userCredential.user) {
             setUserId(userCredential.user.uid);
           } else {
@@ -242,6 +241,51 @@ Ctrl + V で 貼り付け
 Ctrl + S で 保存`);
     };
 
+    const exportImage = () => {
+      if (mmSvgRef.current === null) {
+        return;
+      }
+
+      const svgData = new XMLSerializer().serializeToString(mmSvgRef.current);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgData, 'application/xml');
+
+      if (doc.firstChild === null) {
+        return;
+      }
+
+      const firstChild = doc.firstChild as SVGSVGElement;
+      const rootNode = state.idMap[ROOT_NODE_ID];
+      const height = (rootNode.ephemeral?.geometry.height || 0) + 15;
+      const width = rootNode.ephemeral?.geometry.width || 0;
+      firstChild.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      firstChild.setAttribute('width', `${width}`);
+      firstChild.setAttribute('height', `${height}`);
+
+      const modifiedSvgData = new XMLSerializer().serializeToString(doc);
+
+      const canvas = document.createElement('canvas');
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+
+      if (ctx === null) {
+        return;
+      }
+
+      const image = new Image();
+      image.onload = function () {
+        ctx.drawImage(image, 0, 0);
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.setAttribute('download', 'image.png');
+        a.dispatchEvent(new MouseEvent('click'));
+      };
+      image.src = 'data:image/svg+xml;charset=utf-8;base64,' + btoa(unescape(encodeURIComponent(modifiedSvgData)));
+    };
+
     return (
       <div className="App">
         <div ref={headerRef}>
@@ -251,8 +295,14 @@ Ctrl + S で 保存`);
           <button onClick={() => switchView()}>switch</button>
           &nbsp;|&nbsp;
           <button onClick={() => showManual()}>help</button>
+          {state.viewMode === 'mindMap' ? (
+            <>
+              &nbsp;|&nbsp;
+              <button onClick={() => exportImage()}>export</button>
+            </>
+          ) : null}
         </div>
-        {state.viewMode === 'bulletList' ? <BulletList /> : <MindMap headerRef={headerRef} />}
+        {state.viewMode === 'bulletList' ? <BulletList /> : <MindMap headerRef={headerRef} mmSvgRef={mmSvgRef} />}
       </div>
     );
   }

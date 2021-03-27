@@ -4,7 +4,7 @@ import NodeSvgElement from './NodeSvgElement';
 import { useActions, calculatedAppState, ROOT_NODE_ID } from './state';
 import { getTextWidth, getTextHeight } from './actions/utils';
 
-function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
+function MindMap({ headerRef, mmSvgRef }: { headerRef: RefObject<HTMLElement>, mmSvgRef: RefObject<SVGSVGElement> }) {
   const state = useRecoilValue(calculatedAppState);
   const [mindMapAreaSize, setMindMapAreaSize] = useState({ width: 500, height: 800 });
   const [isScrolling, setIsScrolling] = useState(false);
@@ -15,6 +15,7 @@ function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
   const { selectRightMiddleNode, selectUnderSameDepthNode, selectOverSameDepthNode } = useActions();
 
   const mmAreaRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     function handleResize() {
       setMindMapAreaSize({
@@ -134,6 +135,7 @@ function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
     }
 
     const actualWidth = getTextWidth(selectingNode.name);
+
     if (viewPort.right < geometry.left) {
       scroll.x = geometry.left + actualWidth - mindMapAreaSize.width;
     }
@@ -152,6 +154,7 @@ function MindMap({ headerRef }: { headerRef: RefObject<HTMLElement> }) {
         viewBox={`${scrollPosition.x} ${scrollPosition.y} ${mindMapAreaSize.width} ${mindMapAreaSize.height}`}
         width={mindMapAreaSize.width}
         height={mindMapAreaSize.height}
+        ref={mmSvgRef}
       >
         <NodeSvgElement nodeId={ROOT_NODE_ID} />
       </svg>

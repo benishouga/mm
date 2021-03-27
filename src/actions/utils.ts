@@ -22,7 +22,7 @@ function measureNodeGeometry(node: MmNode, state: AppState): { width: number; he
     { width: 0, height: 0 }
   );
 
-  const currentWidth = result.width + getTextWidth(node.name);
+  const currentWidth = result.width + getTextWidth(node.name) + 30;
   const currentHeight = Math.max(result.height, 30);
   node.ephemeral = {
     geometry: {
