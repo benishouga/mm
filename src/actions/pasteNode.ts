@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 import { pushHistory } from './pushHistory';
 import { convertPlainTextToMmNodes } from './utils';
@@ -11,7 +11,7 @@ export const pasteNode = (state: AppState, plaintext: string) => {
   const mmNodes = convertPlainTextToMmNodes(plaintext);
 
   return pushHistory(
-    produce(state, (draft) => {
+    AutoMerge.change(state, (draft) => {
       mmNodes.forEach((node) => {
         if (!node.parent) {
           node.parent = state.selectingId;

@@ -6,8 +6,8 @@ import firebaseALL from 'firebase';
 import { firebaseConfig } from './.firebase';
 
 firebase.initializeApp(firebaseConfig);
-const db: any = firebaseALL.database();
 if (process.env.USE_EMULATOR === 'true') {
-  db.useEmulator('localhost', 9000);
+  firebaseALL.database().useEmulator('localhost', 9000);
+  firebaseALL.auth().useEmulator('http://localhost:9099');
 }
 export { firebase };

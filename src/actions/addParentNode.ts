@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 import { v4 as uuidv4 } from 'uuid';
 import { pushHistory } from './pushHistory';
@@ -22,7 +22,7 @@ export const addParentNode = (state: AppState, _name: string) => {
   const index = state.idMap[parentId].children.indexOf(selectingId);
 
   return pushHistory(
-    produce(state, (draft) => {
+    AutoMerge.change(state, (draft) => {
       if (editingId) {
         draft.idMap[editingId].name = tmpName;
       }
@@ -30,8 +30,8 @@ export const addParentNode = (state: AppState, _name: string) => {
       draft.editingId = newId;
       const name = newId.slice(0, 4);
       draft.tmpName = name;
-      draft.cacheMap = state.idMap;
-      draft.cacheSelectingId = state.selectingId;
+      draft.cacheMap = JSON.parse(JSON.stringify(draft.idMap));
+      draft.cacheSelectingId = draft.selectingId;
       draft.idMap[parentId].children[index] = newId;
       draft.idMap[newId] = {
         name,

@@ -1,8 +1,8 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 
 export const switchView = (state: AppState) => {
-  return produce(state, (draft) => {
+  return AutoMerge.change(state, (draft) => {
     if (state.viewMode === 'bulletList') {
       draft.viewMode = 'mindMap';
     } else {

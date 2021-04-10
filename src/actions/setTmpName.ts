@@ -1,8 +1,8 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 
 export const setTmpName = (state: AppState, name: string) => {
-  return produce(state, (draft) => {
+  return AutoMerge.change(state, (draft) => {
     draft.tmpName = name;
   });
 };

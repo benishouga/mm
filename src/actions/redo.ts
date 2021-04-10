@@ -1,14 +1,14 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 
 export const redo = (state: AppState) => {
   if (state.idMapHistory.currentIndex === state.idMapHistory.history.length - 1) {
     return state;
   }
-  return produce(state, (draft) => {
+  return AutoMerge.change(state, (draft) => {
     draft.idMapHistory.currentIndex++;
     const history = state.idMapHistory.history[draft.idMapHistory.currentIndex];
-    draft.idMap = history.idMap;
+    draft.idMap = JSON.parse(JSON.stringify(history.idMap));
     draft.selectingId = history.selectingId;
   });
 };

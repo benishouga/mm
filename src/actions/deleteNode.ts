@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 import { pushHistory } from './pushHistory';
 import { collectChildrenIds } from './utils';
@@ -32,7 +32,7 @@ export const deleteNode = (state: AppState) => {
   }
 
   return pushHistory(
-    produce(state, (draft) => {
+    AutoMerge.change(state, (draft) => {
       ids.forEach((id) => {
         delete draft.idMap[id];
       });

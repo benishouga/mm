@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 
 function getDepthAndOneYoungerBrotherId(
@@ -26,7 +26,7 @@ const selectSameDepthNode = (state: AppState, depth: number, targetNodeId: strin
   const children = state.idMap[targetNodeId].children;
 
   if (children.length === 0 || depth === 0) {
-    return produce(state, (draft) => {
+    return AutoMerge.change(state, (draft) => {
       draft.selectingId = targetNodeId;
     });
   }

@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState, IdMap, initialIdMap, ROOT_NODE_ID } from '../state';
 import firebase from 'firebase/app';
 import 'firebase/database';
@@ -16,7 +16,7 @@ export const load = async (state: AppState, mmid: string) => {
   });
 
   if (!data) {
-    return produce(state, (draft) => {
+    return AutoMerge.change(state, (draft) => {
       draft.mmid = mmid;
       draft.idMap = initialIdMap;
       draft.idMapHistory = {
@@ -36,7 +36,7 @@ export const load = async (state: AppState, mmid: string) => {
       })
   );
 
-  return produce(state, (draft) => {
+  return AutoMerge.change(state, (draft) => {
     draft.mmid = mmid;
     draft.idMap = data;
     draft.idMapHistory = {

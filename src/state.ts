@@ -1,4 +1,5 @@
-import { atom, useRecoilState, selector, useRecoilValue } from 'recoil';
+import { atom, useRecoilState, selector, useRecoilValue, SetterOrUpdater } from 'recoil';
+import AutoMerge from 'automerge';
 import { completeNodeEditing } from './actions/completeNodeEditing';
 import { cancelNodeEditing } from './actions/cancelNodeEditing';
 import { addYoungerSiblingNode } from './actions/addYoungerSiblingNode';
@@ -27,6 +28,7 @@ import { switchView } from './actions/switchView';
 import { selectOverSameDepthNode } from './actions/selectOverSameDepthNode';
 import { selectUnderSameDepthNode } from './actions/selectUnderSameDepthNode';
 import { pasteNode } from './actions/pasteNode';
+import { useCallback, useEffect, useState } from 'react';
 
 export type IdMap = {
   root: MmNode;
@@ -83,7 +85,7 @@ export const initialIdMap = {
 
 export const appState = atom<AppState>({
   key: 'appState',
-  default: {
+  default: AutoMerge.from({
     idMapHistory: {
       history: [{ idMap: initialIdMap, selectingId: ROOT_NODE_ID }],
       currentIndex: 0,
@@ -98,7 +100,7 @@ export const appState = atom<AppState>({
     cacheSelectingId: null,
     viewMode: 'mindMap',
     isDirty: false,
-  },
+  }),
 });
 
 export const calculatedAppState = selector({
@@ -114,7 +116,73 @@ export const calculatedAppState = selector({
 const DEFAULT_NAME = 'undefined';
 
 export const useActions = () => {
-  const [state, setState] = useRecoilState(appState);
+  const [state, setStateOriginal] = useRecoilState(appState);
+  const [loaded, setLoaded] = useState(false);
+
+  const setState = useCallback<SetterOrUpdater<AppState>>(
+    (newState) => {
+      const changes = AutoMerge.getChanges(state, newState as any);
+      console.log('AutoMerge getShanges', changes);
+      setStateOriginal(newState);
+      (window as any).aite.postMessage({ source: 'mm', body: changes }, '*');
+    },
+    [setStateOriginal]
+  );
+
+  // useEffect(() => {
+  //   if (!window.opener && loaded) {
+  //     const id = setTimeout(() => {
+  //       const serialized = AutoMerge.save(state);
+  //       console.log(serialized);
+  //       aite.postMessage({ source: 'mm-init', body: serialized }, '*');
+  //     }, 10000);
+  //     return () => clearTimeout(id);
+  //   }
+  // }, [loaded]);
+
+  useEffect(() => {
+    console.log("useEffect");
+    if (!loaded) {
+      return;
+    }
+    const callback = (message: MessageEvent) => {
+      console.log("callback");
+      if (message.data.source === 'mm') {
+        console.log('AutoMerge mm-changes', message);
+        const changed = AutoMerge.applyChanges(state, message.data.body);
+        console.log('changed', changed);
+        setStateOriginal(changed);
+      } else if (message.data.source === 'mm-init') {
+        console.log('AutoMerge mm-init', message);
+        const initialState = AutoMerge.load<AppState>(message.data.body);
+        console.log('changed', initialState);
+        setStateOriginal(initialState);
+      }
+    };
+    window.addEventListener('message', callback);
+    return () => {
+      window.removeEventListener('message', callback);
+    };
+  }, [state, loaded]);
+
+  useEffect(() => {
+    if (!loaded) {
+      return;
+    }
+    const callback = (message: MessageEvent) => {
+      if (message.data.source === 'mm') {
+        console.log('AutoMerge applyChanges', message);
+        const changed = AutoMerge.applyChanges(state, message.data.body);
+        console.log('changed', changed);
+        setStateOriginal(changed);
+      }
+    };
+    window.addEventListener('message', callback);
+    return () => {
+      window.removeEventListener('message', callback);
+    };
+  }, [state, loaded]);
+
   const calculatedNodeState = useRecoilValue(calculatedAppState);
   return {
     completeNodeEditing: () => {
@@ -206,11 +274,16 @@ export const useActions = () => {
     },
 
     save: (mmid: string) => {
-      setState(save(state, mmid));
+      setStateOriginal(save(state, mmid));
     },
 
     load: async (mmid: string) => {
-      setState(await load(state, mmid));
+      if (window.opener) {
+        return;
+      }
+      console.log('load action');
+      setStateOriginal(await load(state, mmid));
+      setLoaded(true);
     },
 
     switchView: () => {

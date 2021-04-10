@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 import { pushHistory } from './pushHistory';
 import { collectChildrenIds } from './utils';
@@ -7,13 +7,13 @@ export const dropToBefore = (state: AppState, nodeId: string) => {
   const draggingId = state.draggingId;
 
   if (!draggingId || draggingId === nodeId) {
-    return produce(state, (draft) => {
+    return AutoMerge.change(state, (draft) => {
       draft.draggingId = null;
     });
   }
 
   return pushHistory(
-    produce(state, (draft) => {
+    AutoMerge.change(state, (draft) => {
       draft.draggingId = null;
       const draggingNode = draft.idMap[draggingId];
       if (collectChildrenIds(draggingNode, draft).indexOf(nodeId) !== -1) {

@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 
 export const cancelNodeEditing = (state: AppState) => {
@@ -13,7 +13,7 @@ export const cancelNodeEditing = (state: AppState) => {
       return state;
     }
 
-    return produce(state, (draft) => {
+    return AutoMerge.change(state, (draft) => {
       if (draft.cacheMap) {
         draft.idMap = draft.cacheMap;
       }
@@ -27,7 +27,7 @@ export const cancelNodeEditing = (state: AppState) => {
     });
   }
 
-  return produce(state, (draft) => {
+  return AutoMerge.change(state, (draft) => {
     draft.editingId = null;
   });
 };

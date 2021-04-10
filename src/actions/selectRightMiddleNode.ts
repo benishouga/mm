@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState, Geometry } from '../state';
 
 export const selectRightMiddleNode = (state: AppState) => {
@@ -18,7 +18,7 @@ export const selectRightMiddleNode = (state: AppState) => {
     width: 0,
     height: 0,
   };
-  return produce(state, (draft) => {
+  return AutoMerge.change(state, (draft) => {
     const childNodes = children.map((child) => state.idMap[child]);
     const actualCurrentTop = currentGeometry.calculatingTop + currentGeometry.height / 2;
     let targetTop = 0;

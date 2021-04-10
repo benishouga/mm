@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 
 const selectSiblingChildNode = (state: AppState, targetNodeId: string): AppState => {
@@ -6,7 +6,7 @@ const selectSiblingChildNode = (state: AppState, targetNodeId: string): AppState
   const children = state.idMap[targetNodeId].children;
 
   if (children.length === 0) {
-    return produce(state, (draft) => {
+    return AutoMerge.change(state, (draft) => {
       draft.selectingId = targetNodeId;
     });
   }
@@ -29,7 +29,7 @@ export const selectOverNode = (state: AppState) => {
   const selectingNodeIndex = parent.children.indexOf(state.selectingId);
 
   if (selectingNodeIndex === 0) {
-    return produce(state, (draft) => {
+    return AutoMerge.change(state, (draft) => {
       draft.selectingId = parentId;
     });
   }

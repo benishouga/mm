@@ -13,6 +13,28 @@ import MindMap from './MindMap';
 import { useHash, usePrefersDarkMode } from './hooks';
 import { convertIdMapToPlainText } from './actions/utils';
 
+// import Automerge from 'automerge';
+
+// interface HogeState {
+//   cards: string[];
+// }
+// const docA = Automerge.from<HogeState>({ cards: [] }); // doc = { cards: [] }
+// const serialized = Automerge.save(docA);
+// const docB = Automerge.load<HogeState>(serialized); // doc = { cards: [] }
+
+
+// // On one node
+// const newDocA = Automerge.change(docA, (draft) => {
+//   draft.cards.push('test');
+// });
+// const changes = Automerge.getChanges(docA, newDocA);
+
+// const applyedDocA = Automerge.applyChanges(docA, changes);
+// console.log("applyedDocA", applyedDocA);
+
+// const applyedDocB = Automerge.applyChanges(docB, changes);
+// console.log("applyedDocB", applyedDocB);
+
 function App() {
   function InnerApp() {
     const state = useRecoilValue(calculatedAppState);
@@ -170,6 +192,7 @@ function App() {
     }, [state]);
 
     useEffect(() => {
+      console.log('hash', hash, userId);
       // ■パターン
       // 新規ロード(ハッシュなし)
       // 新規ロード(ハッシュあり)

@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 import { pushHistory } from './pushHistory';
 
@@ -11,12 +11,12 @@ export const completeNodeEditing = (state: AppState) => {
   }
 
   if (state.idMap[editingId].name === tmpName) {
-    const newState = { ...state };
-    newState.editingId = null;
-    return newState;
+    return AutoMerge.change(state, (draft) => {
+      draft.editingId = null;
+    });
   } else {
     return pushHistory(
-      produce(state, (draft) => {
+      AutoMerge.change(state, (draft) => {
         draft.editingId = null;
         draft.cacheMap = null;
         draft.cacheSelectingId = null;

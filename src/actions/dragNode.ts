@@ -1,8 +1,8 @@
-import { produce } from 'immer';
+import AutoMerge from 'automerge';
 import { AppState } from '../state';
 
 export const dragNode = (state: AppState, nodeId: string | null) => {
-  return produce(state, (draft) => {
+  return AutoMerge.change(state, (draft) => {
     draft.draggingId = nodeId;
   });
 };
