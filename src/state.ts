@@ -126,8 +126,10 @@ export const useActions = () => {
       setStateOriginal(newState);
       (window as any).aite.postMessage({ source: 'mm', body: changes }, '*');
     },
-    [setStateOriginal]
+    [setStateOriginal, state]
   );
+
+  // const [docA, setDocA] = useState({ cards: [] });
 
   // useEffect(() => {
   //   if (!window.opener && loaded) {
@@ -141,47 +143,62 @@ export const useActions = () => {
   // }, [loaded]);
 
   useEffect(() => {
-    console.log("useEffect");
+    if (!window.opener && loaded) {
+      const id = setTimeout(() => {
+        const serialized = AutoMerge.save(state);
+        (window as any).aite.postMessage({ source: 'mm-init', body: serialized }, '*');
+      }, 10000);
+      return () => clearTimeout(id);
+    }
+  }, [loaded]);
+
+  useEffect(() => {
+    console.log('useEffect');
+    console.log('loaded', loaded);
+    console.log('state', state);
     if (!loaded) {
       return;
     }
     const callback = (message: MessageEvent) => {
-      console.log("callback");
-      if (message.data.source === 'mm') {
+      console.log('callback');
+      console.log("message", message);
+      if (message.data?.source === 'mm') {
         console.log('AutoMerge mm-changes', message);
         const changed = AutoMerge.applyChanges(state, message.data.body);
         console.log('changed', changed);
         setStateOriginal(changed);
-      } else if (message.data.source === 'mm-init') {
+      } else if (message.data?.source === 'mm-init') {
         console.log('AutoMerge mm-init', message);
         const initialState = AutoMerge.load<AppState>(message.data.body);
         console.log('changed', initialState);
         setStateOriginal(initialState);
       }
     };
+    // (window as any).register(callback);
     window.addEventListener('message', callback);
     return () => {
+      // (window as any).remove(callback);
       window.removeEventListener('message', callback);
     };
   }, [state, loaded]);
 
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-    const callback = (message: MessageEvent) => {
-      if (message.data.source === 'mm') {
-        console.log('AutoMerge applyChanges', message);
-        const changed = AutoMerge.applyChanges(state, message.data.body);
-        console.log('changed', changed);
-        setStateOriginal(changed);
-      }
-    };
-    window.addEventListener('message', callback);
-    return () => {
-      window.removeEventListener('message', callback);
-    };
-  }, [state, loaded]);
+  // useEffect(() => {
+  //   if (!loaded) {
+  //     return;
+  //   }
+  //   const callback = (message: MessageEvent) => {
+  //     if (message.data.source === 'mm') {
+  //       console.log('AutoMerge applyChanges', message);
+  //       const changed = AutoMerge.applyChanges(state, message.data.body);
+  //       console.log('changed', changed);
+  //       setStateOriginal(changed);
+  //     }
+  //   };
+  //   window.addEventListener('message', callback);
+  //   return () => {
+  //     window.removeEventListener('message', callback);
+  //   };
+  // }, [state, loaded]);
 
   const calculatedNodeState = useRecoilValue(calculatedAppState);
   return {
@@ -279,9 +296,9 @@ export const useActions = () => {
 
     load: async (mmid: string) => {
       if (window.opener) {
+        setLoaded(true);
         return;
       }
-      console.log('load action');
       setStateOriginal(await load(state, mmid));
       setLoaded(true);
     },
