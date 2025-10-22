@@ -11,5 +11,5 @@ export default defineConfig({
     port: 8080,
     open: true,
   },
-  envPrefix: ['VITE_', 'USE_', 'FIREBASE_'],
+  envPrefix: ['VITE_'],
 });

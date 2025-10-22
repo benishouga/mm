@@ -20,7 +20,7 @@ import { dropToBefore } from './actions/dropToBefore';
 import { dropToChild } from './actions/dropToChild';
 import { dragNode } from './actions/dragNode';
 import { save } from './actions/save';
-import { load } from './actions/load';
+import { LoadPayload, load } from './actions/load';
 import { calculateNodeGeometry } from './actions/utils';
 import { produce } from 'immer';
 import { switchView } from './actions/switchView';
@@ -108,7 +108,7 @@ export const calculatedAppState = atom<AppState>((get) => {
 const DEFAULT_NAME = 'undefined';
 
 export const useActions = () => {
-  const [state, setState] = useAtom(appState);
+  const [, setState] = useAtom(appState);
   const calculatedNodeState = useAtomValue(calculatedAppState);
   return {
     completeNodeEditing: () => {
@@ -203,8 +203,8 @@ export const useActions = () => {
       setState((prev) => save(prev, mmid));
     },
 
-    load: async (mmid: string) => {
-      setState(await load(state, mmid));
+    load: (payload: LoadPayload) => {
+      setState((prev) => load(prev, payload));
     },
 
     switchView: () => {
