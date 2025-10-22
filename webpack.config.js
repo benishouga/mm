@@ -3,11 +3,12 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 
-const publidDir = __dirname + '/public';
+const publicDir = path.resolve(__dirname, 'public');
+const isProduction = process.env.NODE_ENV === 'production';
 
-let env = dotenv.config().parsed;
+let env = dotenv.config().parsed || {};
 let specifiedEnvPath;
-if (process.env.NODE_ENV === 'production') {
+if (isProduction) {
   specifiedEnvPath = path.resolve(process.cwd(), '.env.production');
 } else {
   specifiedEnvPath = path.resolve(process.cwd(), '.env.development');
@@ -22,9 +23,10 @@ if (fs.existsSync(specifiedEnvPath)) {
 }
 
 module.exports = {
+  mode: isProduction ? 'production' : 'development',
   entry: ['./src/index.tsx'],
   output: {
-    path: publidDir,
+    path: publicDir,
     publicPath: '/',
     filename: 'main.js',
   },
@@ -40,6 +42,19 @@ module.exports = {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
   devtool: 'inline-source-map',
+  performance: isProduction
+    ? undefined
+    : {
+        hints: false,
+      },
+  devServer: {
+    static: {
+      directory: publicDir,
+    },
+    hot: true,
+    open: true,
+    historyApiFallback: true,
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(env),

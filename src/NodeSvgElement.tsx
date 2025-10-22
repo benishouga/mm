@@ -74,7 +74,7 @@ function NodeSvgElement(props: { nodeId: string }) {
 
   let children: JSX.Element[] | null = null;
   if (node.children.length > 0) {
-    children = node.children.map((id) => (
+    children = node.children.map((id: string) => (
       <React.Fragment key={id}>
         <NodeSvgElement nodeId={id} />
         <LineSvgElement parentNodeId={props.nodeId} childNodeId={id} />

@@ -22,7 +22,7 @@ import { dragNode } from './actions/dragNode';
 import { save } from './actions/save';
 import { load } from './actions/load';
 import { calculateNodeGeometry } from './actions/utils';
-import produce from 'immer';
+import { produce } from 'immer';
 import { switchView } from './actions/switchView';
 import { selectOverSameDepthNode } from './actions/selectOverSameDepthNode';
 import { selectUnderSameDepthNode } from './actions/selectUnderSameDepthNode';

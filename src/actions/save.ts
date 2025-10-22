@@ -1,6 +1,6 @@
 import { AppState } from '../state';
-import firebase from 'firebase/app';
-import 'firebase/database';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
 import { produce } from 'immer';
 
 export const save = (state: AppState, mmid: string) => {
