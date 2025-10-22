@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --mode production",
+    "build": "cross-env NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --mode production",
     "format": "prettier --parser typescript --write  \"./src/**/*.ts\" \"./src/**/*.tsx\"",
-    "start": "webpack-dev-server --content-base public --hot --open",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --content-base public --hot --open",
     "dev": "concurrently \"npm run emulator\" \"npm start\"",
     "emulator": "firebase emulators:start --only database --import=./.firebase_emulator_data --export-on-exit",
     "deploy": "npm run build && firebase deploy"
