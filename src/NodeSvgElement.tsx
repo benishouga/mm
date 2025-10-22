@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useAtomValue } from 'jotai';
 import { useDrop, useDrag, DragPreviewImage } from 'react-dnd';
 
 import { calculatedAppState, useActions, Geometry } from './state';
@@ -9,7 +9,7 @@ import { getTextWidth } from './actions/utils';
 import { useAutoFocus, usePrefersDarkMode } from './hooks';
 
 function NodeSvgElement(props: { nodeId: string }) {
-  const state = useRecoilValue(calculatedAppState);
+  const state = useAtomValue(calculatedAppState);
   const node = state.idMap[props.nodeId];
 
   const inputRef = useAutoFocus<HTMLInputElement>([state.editingId]);

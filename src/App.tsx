@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { RecoilRoot, useRecoilValue } from 'recoil';
+import { Provider, useAtomValue } from 'jotai';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import firebase from 'firebase/compat/app';
@@ -15,7 +15,7 @@ import { convertIdMapToPlainText } from './actions/utils';
 
 function App() {
   function InnerApp() {
-    const state = useRecoilValue(calculatedAppState);
+    const state = useAtomValue(calculatedAppState);
     const [hash, setHash] = useHash();
     const [userId, setUserId] = useState<string | null>(null);
 
@@ -309,9 +309,9 @@ Ctrl + S で 保存`);
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <RecoilRoot>
+      <Provider>
         <InnerApp />
-      </RecoilRoot>
+      </Provider>
     </DndProvider>
   );
 }

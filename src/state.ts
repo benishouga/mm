@@ -1,4 +1,4 @@
-import { atom, useRecoilState, selector, useRecoilValue } from 'recoil';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { completeNodeEditing } from './actions/completeNodeEditing';
 import { cancelNodeEditing } from './actions/cancelNodeEditing';
 import { addYoungerSiblingNode } from './actions/addYoungerSiblingNode';
@@ -82,99 +82,93 @@ export const initialIdMap = {
 };
 
 export const appState = atom<AppState>({
-  key: 'appState',
-  default: {
-    idMapHistory: {
-      history: [{ idMap: initialIdMap, selectingId: ROOT_NODE_ID }],
-      currentIndex: 0,
-    },
-    mmid: '',
-    idMap: initialIdMap,
-    selectingId: ROOT_NODE_ID,
-    editingId: null,
-    draggingId: null,
-    tmpName: null,
-    cacheMap: null,
-    cacheSelectingId: null,
-    viewMode: 'mindMap',
-    isDirty: false,
+  idMapHistory: {
+    history: [{ idMap: initialIdMap, selectingId: ROOT_NODE_ID }],
+    currentIndex: 0,
   },
+  mmid: '',
+  idMap: initialIdMap,
+  selectingId: ROOT_NODE_ID,
+  editingId: null,
+  draggingId: null,
+  tmpName: null,
+  cacheMap: null,
+  cacheSelectingId: null,
+  viewMode: 'mindMap',
+  isDirty: false,
 });
 
-export const calculatedAppState = selector({
-  key: 'calculatedAppState',
-  get: ({ get }) => {
-    const state = produce(get(appState), (draft) => {
-      calculateNodeGeometry(draft.idMap[ROOT_NODE_ID], draft);
-    });
-    return state;
-  },
+export const calculatedAppState = atom<AppState>((get) => {
+  const state = produce(get(appState), (draft) => {
+    calculateNodeGeometry(draft.idMap[ROOT_NODE_ID], draft);
+  });
+  return state;
 });
 
 const DEFAULT_NAME = 'undefined';
 
 export const useActions = () => {
-  const [state, setState] = useRecoilState(appState);
-  const calculatedNodeState = useRecoilValue(calculatedAppState);
+  const [state, setState] = useAtom(appState);
+  const calculatedNodeState = useAtomValue(calculatedAppState);
   return {
     completeNodeEditing: () => {
-      setState(completeNodeEditing(state));
+      setState((prev) => completeNodeEditing(prev));
     },
 
     cancelNodeEditing: () => {
-      setState(cancelNodeEditing(state));
+      setState((prev) => cancelNodeEditing(prev));
     },
 
     addYoungerSiblingNode: () => {
-      setState(addYoungerSiblingNode(state, DEFAULT_NAME));
+      setState((prev) => addYoungerSiblingNode(prev, DEFAULT_NAME));
     },
 
     addOlderSiblingNode: () => {
-      setState(addOlderSiblingNode(state, DEFAULT_NAME));
+      setState((prev) => addOlderSiblingNode(prev, DEFAULT_NAME));
     },
 
     addNewNode: () => {
-      setState(addNewNode(state, DEFAULT_NAME));
+      setState((prev) => addNewNode(prev, DEFAULT_NAME));
     },
 
     addParentNode: () => {
-      setState(addParentNode(state, DEFAULT_NAME));
+      setState((prev) => addParentNode(prev, DEFAULT_NAME));
     },
 
     deleteNode: () => {
-      setState(deleteNode(state));
+      setState((prev) => deleteNode(prev));
     },
 
     editNode: (nodeId: string, name: string) => {
-      setState(editNode(state, nodeId, name));
+      setState((prev) => editNode(prev, nodeId, name));
     },
 
     selectNode: (nodeId: string) => {
-      setState(selectNode(state, nodeId));
+      setState((prev) => selectNode(prev, nodeId));
     },
 
     selectParentNode: () => {
-      setState(selectParentNode(state));
+      setState((prev) => selectParentNode(prev));
     },
 
     selectChildNode: () => {
-      setState(selectChildNode(state));
+      setState((prev) => selectChildNode(prev));
     },
 
     selectUnderNode: () => {
-      setState(selectUnderNode(state));
+      setState((prev) => selectUnderNode(prev));
     },
 
     selectUnderSameDepthNode: () => {
-      setState(selectUnderSameDepthNode(state));
+      setState((prev) => selectUnderSameDepthNode(prev));
     },
 
     selectOverNode: () => {
-      setState(selectOverNode(state));
+      setState((prev) => selectOverNode(prev));
     },
 
     selectOverSameDepthNode: () => {
-      setState(selectOverSameDepthNode(state));
+      setState((prev) => selectOverSameDepthNode(prev));
     },
 
     selectRightMiddleNode: () => {
@@ -182,31 +176,31 @@ export const useActions = () => {
     },
 
     setTmpName: (name: string) => {
-      setState(setTmpName(state, name));
+      setState((prev) => setTmpName(prev, name));
     },
 
     undo: () => {
-      setState(undo(state));
+      setState((prev) => undo(prev));
     },
 
     redo: () => {
-      setState(redo(state));
+      setState((prev) => redo(prev));
     },
 
     dropToBefore: (nodeId: string) => {
-      setState(dropToBefore(state, nodeId));
+      setState((prev) => dropToBefore(prev, nodeId));
     },
 
     dropToChild: (nodeId: string) => {
-      setState(dropToChild(state, nodeId));
+      setState((prev) => dropToChild(prev, nodeId));
     },
 
     dragNode: (nodeId: string | null) => {
-      setState(dragNode(state, nodeId));
+      setState((prev) => dragNode(prev, nodeId));
     },
 
     save: (mmid: string) => {
-      setState(save(state, mmid));
+      setState((prev) => save(prev, mmid));
     },
 
     load: async (mmid: string) => {
@@ -214,11 +208,11 @@ export const useActions = () => {
     },
 
     switchView: () => {
-      setState(switchView(state));
+      setState((prev) => switchView(prev));
     },
 
     pasteNode: (plainText: string) => {
-      setState(pasteNode(state, plainText));
+      setState((prev) => pasteNode(prev, plainText));
     },
   };
 };

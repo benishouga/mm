@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useAtomValue } from 'jotai';
 import NodeElement from './NodeElement';
 import { appState, useActions, ROOT_NODE_ID } from './state';
 
 function BulletList() {
-  const [state] = useRecoilState(appState);
+  const state = useAtomValue(appState);
 
   const { selectChildNode, selectUnderNode, selectOverNode } = useActions();
 
