@@ -8,7 +8,8 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.database();
-if (process.env.USE_EMULATOR === 'true') {
+const useEmulator = import.meta.env.USE_EMULATOR === 'true';
+if (useEmulator) {
   db.useEmulator('localhost', 9000);
 }
 export { firebase };
