@@ -1,5 +1,8 @@
 # Repository Guidelines
 
+## Environment
+- Target Node.js version: 22 LTS (`.nvmrc` provided).
+
 ## Project Structure & Module Organization
 - App code lives in `src/` (TypeScript + React). Entry: `src/index.tsx`. Root app: `src/App.tsx`. UI elements/components: `src/*.tsx` (e.g., `src/MindMap.tsx`, `src/BulletList.tsx`).
 - Actions and state updates: `src/actions/*.ts` (imperative names like `addNewNode.ts`, `undo.ts`). Shared state in `src/state.ts`, config in `src/config.ts`, hooks in `src/hooks.ts`.
