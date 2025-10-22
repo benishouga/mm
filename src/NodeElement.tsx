@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef, useEffect } from 'react';
+import { ChangeEvent, useRef, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { useDrop, useDrag } from 'react-dnd';
 

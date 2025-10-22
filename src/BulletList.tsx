@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import NodeElement from './NodeElement';
 import { appState, useActions, ROOT_NODE_ID } from './state';

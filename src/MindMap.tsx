@@ -1,4 +1,5 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import { useRecoilValue } from 'recoil';
 import NodeSvgElement from './NodeSvgElement';
 import { useActions, calculatedAppState, ROOT_NODE_ID } from './state';
@@ -142,7 +143,7 @@ function MindMap({ headerRef, mmSvgRef }: { headerRef: RefObject<HTMLElement>, m
     setScrollPosition(scroll);
   }, [state.selectingId]);
 
-  const onMouseDown = (event: React.MouseEvent) => {
+  const onMouseDown = (event: ReactMouseEvent<SVGSVGElement>) => {
     setIsScrolling(true);
     setScrollStartPosition(scrollPosition);
     setScrollStartMousePosition({ x: event.pageX, y: event.pageY });

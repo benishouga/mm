@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import { ChangeEvent, Fragment, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useDrop, useDrag, DragPreviewImage } from 'react-dnd';
 
@@ -75,10 +75,10 @@ function NodeSvgElement(props: { nodeId: string }) {
   let children: JSX.Element[] | null = null;
   if (node.children.length > 0) {
     children = node.children.map((id) => (
-      <React.Fragment key={id}>
+      <Fragment key={id}>
         <NodeSvgElement nodeId={id} />
         <LineSvgElement parentNodeId={props.nodeId} childNodeId={id} />
-      </React.Fragment>
+      </Fragment>
     ));
   }
 
