@@ -5,3 +5,4 @@ src/.*.ts
 *.log
 .firebase/*
 .firebase_emulator_data/*
+dist/

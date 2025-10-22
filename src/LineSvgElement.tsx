@@ -1,12 +1,12 @@
 import React from 'react';
-import { useRecoilValue } from 'recoil';
+import { useAtomValue } from 'jotai';
 
 import { calculatedAppState, Geometry } from './state';
 import { getTextWidth } from './actions/utils';
 import { usePrefersDarkMode } from './hooks';
 
 function LineSvgElement(props: { parentNodeId: string; childNodeId: string }) {
-  const state = useRecoilValue(calculatedAppState);
+  const state = useAtomValue(calculatedAppState);
   const parentNode = state.idMap[props.parentNodeId];
   const childNode = state.idMap[props.childNodeId];
 

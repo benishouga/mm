@@ -1,49 +1,52 @@
 import { produce } from 'immer';
-import { AppState, IdMap, initialIdMap, ROOT_NODE_ID } from '../state';
-import firebase from 'firebase/app';
-import 'firebase/database';
+import { AppState, IdMap, MmNode, ROOT_NODE_ID, initialIdMap } from '../state';
 
-export const load = async (state: AppState, mmid: string) => {
-  const ref = firebase.database().ref(`/mmm/${mmid}`);
-  const data = await new Promise<IdMap | null>((resolve) => {
-    ref.on('value', (snapshot) => {
-      if (snapshot?.val()) {
-        resolve(snapshot.val());
-      } else {
-        resolve(null);
-      }
-    });
-  });
+export type LoadPayload = {
+  idMap: IdMap | null | undefined;
+  mmid: string;
+};
 
-  if (!data) {
-    return produce(state, (draft) => {
-      draft.mmid = mmid;
-      draft.idMap = initialIdMap;
-      draft.idMapHistory = {
-        history: [{ idMap: initialIdMap, selectingId: ROOT_NODE_ID }],
-        currentIndex: 0,
-      };
-      draft.isDirty = false;
-    });
+const cloneNode = (node: MmNode): MmNode => ({
+  ...node,
+  children: Array.isArray(node.children) ? [...node.children] : [],
+  parent: node.parent ?? null,
+});
+
+const ensureIdMap = (idMap: IdMap | null | undefined): IdMap => {
+  const source = idMap ?? initialIdMap;
+  const entries = Object.entries(source).reduce<IdMap>((acc, [key, value]) => {
+    if (!value) {
+      return acc;
+    }
+
+    acc[key] = cloneNode(value);
+    return acc;
+  }, {} as IdMap);
+
+  if (!entries[ROOT_NODE_ID]) {
+    entries[ROOT_NODE_ID] = cloneNode(initialIdMap[ROOT_NODE_ID]);
   }
 
-  Object.keys(data).forEach(
-    (key) =>
-      (data[key] = {
-        ...data[key],
-        children: data[key].children || [],
-        parent: data[key].parent || null,
-      })
-  );
+  return entries;
+};
+
+export const load = (state: AppState, payload: LoadPayload) => {
+  const { idMap, mmid } = payload;
+  const normalizedIdMap = ensureIdMap(idMap);
 
   return produce(state, (draft) => {
     draft.mmid = mmid;
-    draft.idMap = data;
+    draft.idMap = normalizedIdMap;
     draft.idMapHistory = {
-      history: [{ idMap: data, selectingId: ROOT_NODE_ID }],
+      history: [{ idMap: normalizedIdMap, selectingId: ROOT_NODE_ID }],
       currentIndex: 0,
     };
     draft.selectingId = ROOT_NODE_ID;
+    draft.editingId = null;
+    draft.draggingId = null;
+    draft.tmpName = null;
+    draft.cacheMap = null;
+    draft.cacheSelectingId = null;
     draft.isDirty = false;
   });
 };

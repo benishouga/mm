@@ -1,12 +1,12 @@
 import React, { ChangeEvent, useRef, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useAtomValue } from 'jotai';
 import { useDrop, useDrag } from 'react-dnd';
 
 import { appState, useActions } from './state';
 import { useAutoFocus, usePrefersDarkMode } from './hooks';
 
 function NodeElement(props: { nodeId: string }) {
-  const [state] = useRecoilState(appState);
+  const state = useAtomValue(appState);
   const node = state.idMap[props.nodeId];
   const inputRef = useAutoFocus<HTMLInputElement>([state.editingId]);
   const textRef = useRef<HTMLElement>(null);

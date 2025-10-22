@@ -1,24 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { RecoilRoot, useRecoilValue } from 'recoil';
+import React, { useEffect, useRef } from 'react';
+import { Provider, useAtomValue } from 'jotai';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import firebase from 'firebase/app';
-import 'firebase/auth';
 
 import { v4 as uuidv4 } from 'uuid';
-import './config';
-import { calculatedAppState, ROOT_NODE_ID, useActions } from './state';
+import { calculatedAppState, ROOT_NODE_ID, initialIdMap, useActions } from './state';
 import BulletList from './BulletList';
 import MindMap from './MindMap';
-import { useHash, usePrefersDarkMode } from './hooks';
+import { usePrefersDarkMode } from './hooks';
 import { convertIdMapToPlainText } from './actions/utils';
 
 function App() {
   function InnerApp() {
-    const state = useRecoilValue(calculatedAppState);
-    const [hash, setHash] = useHash();
-    const [userId, setUserId] = useState<string | null>(null);
-
+    const state = useAtomValue(calculatedAppState);
     const isDarkMode = usePrefersDarkMode();
 
     const {
@@ -41,22 +35,98 @@ function App() {
 
     const headerRef = useRef<HTMLDivElement>(null);
     const mmSvgRef = useRef<SVGSVGElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-      firebase
-        .auth()
-        .signInAnonymously()
-        .then((userCredential) => {
-          if (userCredential.user) {
-            setUserId(userCredential.user.uid);
-          } else {
-            console.error('wtf userCredential.user');
+    const ensureJsonExtension = (name: string) => {
+      const trimmed = name.trim();
+      if (!trimmed.toLowerCase().endsWith('.json')) {
+        return `${trimmed}.json`;
+      }
+      return trimmed;
+    };
+
+    const downloadIdMap = (fileName: string) => {
+      const normalizedName = ensureJsonExtension(fileName);
+      const blob = new Blob([JSON.stringify(state.idMap, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = normalizedName;
+      anchor.dispatchEvent(new MouseEvent('click'));
+      URL.revokeObjectURL(url);
+      return normalizedName;
+    };
+
+    const onSaveAs = () => {
+      const defaultName = state.mmid || `mindmap-${uuidv4()}.json`;
+      const input = window.prompt('保存するファイル名（.json）を入力してください', defaultName);
+      if (!input) {
+        return;
+      }
+      const trimmed = input.trim();
+      if (!trimmed) {
+        return;
+      }
+      const savedName = downloadIdMap(trimmed);
+      save(savedName);
+    };
+
+    const onSave = () => {
+      if (!state.mmid) {
+        onSaveAs();
+        return;
+      }
+      const savedName = downloadIdMap(state.mmid);
+      save(savedName);
+    };
+
+    const onCreateNew = () => {
+      if (state.isDirty && !confirm('保存されていない変更があります。新規作成しますか？')) {
+        return;
+      }
+      load({ idMap: initialIdMap, mmid: '' });
+    };
+
+    const onLoadFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const input = event.target;
+      const file = input.files?.[0];
+      if (!file) {
+        input.value = '';
+        return;
+      }
+
+      if (state.isDirty && !confirm('保存されていない変更があります。読み込みますか？')) {
+        input.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const result = reader.result;
+          if (typeof result !== 'string' || result.length === 0) {
+            throw new Error('empty file');
           }
-        })
-        .catch((error) => {
-          console.error(error.code, error.message);
-        });
-    }, []);
+          const parsed = JSON.parse(result);
+          load({ idMap: parsed, mmid: ensureJsonExtension(file.name) });
+        } catch (error) {
+          console.error(error);
+          alert('ファイルの読み込みに失敗しました。JSON 形式か確認してください。');
+        } finally {
+          input.value = '';
+        }
+      };
+      reader.onerror = () => {
+        console.error(reader.error);
+        alert('ファイルの読み込みに失敗しました。');
+        input.value = '';
+      };
+      reader.readAsText(file);
+    };
+
+    const triggerFilePicker = () => {
+      fileInputRef.current?.click();
+    };
 
     function copyHandler() {
       if (!state.selectingId || state.editingId) {
@@ -170,43 +240,8 @@ function App() {
     }, [state]);
 
     useEffect(() => {
-      // ■パターン
-      // 新規ロード(ハッシュなし)
-      // 新規ロード(ハッシュあり)
-      // リロード（ハッシュなし）
-      // リロード（ハッシュあり）
-      // ハッシュなし→ハッシュあり
-      // ハッシュあり→ハッシュなし
-      // ハッシュあり→ハッシュあり（別ページ）
-      // ハッシュなし→別ページ
-      // ハッシュあり→別ページ
-      // History Back(ハッシュなし)
-      // History Back(ハッシュあり)
-      // History Forward(ハッシュなし)
-      // History Forward(ハッシュあり)
-      if (state.isDirty && !confirm('今の消えちゃうよ？')) {
-        setHash(state.mmid || '');
-        return;
-      }
-
-      let mmid = hash;
-      if (mmid && userId) {
-        load(mmid);
-      }
-    }, [hash, userId]);
-
-    useEffect(() => {
       document.body.style.backgroundColor = isDarkMode ? '#222' : 'white';
     }, [isDarkMode]);
-
-    const onSave = () => {
-      let mmid = hash;
-      if (!mmid) {
-        mmid = uuidv4();
-        setHash(mmid);
-      }
-      save(mmid);
-    };
 
     useEffect(() => {
       const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
@@ -289,8 +324,20 @@ Ctrl + S で 保存`);
     return (
       <div className="App">
         <div ref={headerRef}>
+          <button onClick={() => onCreateNew()}>new</button>
+          &nbsp;|&nbsp;
+          <button onClick={() => triggerFilePicker()}>load</button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            style={{ display: 'none' }}
+            onChange={onLoadFromFile}
+          />
+          &nbsp;|&nbsp;
           <button onClick={() => onSave()}>save</button>
-          {/* <button onClick={() => load()}>load</button> */}
+          &nbsp;|&nbsp;
+          <button onClick={() => onSaveAs()}>save as</button>
           &nbsp;|&nbsp;
           <button onClick={() => switchView()}>switch</button>
           &nbsp;|&nbsp;
@@ -309,9 +356,9 @@ Ctrl + S で 保存`);
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <RecoilRoot>
+      <Provider>
         <InnerApp />
-      </RecoilRoot>
+      </Provider>
     </DndProvider>
   );
 }

@@ -1,11 +1,11 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useAtomValue } from 'jotai';
 import NodeSvgElement from './NodeSvgElement';
 import { useActions, calculatedAppState, ROOT_NODE_ID } from './state';
 import { getTextWidth, getTextHeight } from './actions/utils';
 
 function MindMap({ headerRef, mmSvgRef }: { headerRef: RefObject<HTMLElement>, mmSvgRef: RefObject<SVGSVGElement> }) {
-  const state = useRecoilValue(calculatedAppState);
+  const state = useAtomValue(calculatedAppState);
   const [mindMapAreaSize, setMindMapAreaSize] = useState({ width: 500, height: 800 });
   const [isScrolling, setIsScrolling] = useState(false);
   const [scrollPosition, setScrollPosition] = useState({ x: 0, y: 0 });
