@@ -19,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/benishouga/mm/issues"
   },
-  "homepage": "https://github.com/benishouga/mm#readme",
+  "homepage": "https://benishouga.github.io/mm/",
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

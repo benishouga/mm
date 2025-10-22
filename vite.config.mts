@@ -1,7 +1,23 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+const normalizeBasePath = (value?: string) => {
+  if (!value?.trim()) {
+    return '/';
+  }
+
+  let normalized = value.trim();
+  if (!normalized.startsWith('/')) {
+    normalized = `/${normalized}`;
+  }
+  if (!normalized.endsWith('/')) {
+    normalized = `${normalized}/`;
+  }
+  return normalized;
+};
+
+export default defineConfig(() => ({
+  base: normalizeBasePath(process.env.VITE_BASE_PATH),
   plugins: [
     react({
       jsxRuntime: 'classic',
@@ -12,4 +28,4 @@ export default defineConfig({
     open: true,
   },
   envPrefix: ['VITE_'],
-});
+}));
