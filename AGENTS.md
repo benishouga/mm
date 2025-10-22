@@ -33,3 +33,8 @@
 ## Firebase & Environment Notes
 - Copy `.env` from teammates or set `FIREBASE_API_KEY`, `PROJECT_ID`, and related values per environment. Never commit production secrets.
 - Keep emulator usage optional for reviewers by syncing `.firebase_emulator_data/` after data model changes and documenting regen commands.
+
+## GitHub Pages Deployment
+- Pushes to `main` trigger `.github/workflows/deploy.yml`, which builds the site and deploys it to GitHub Pages.
+- The workflow sets `VITE_BASE_PATH=/mm/` so the production bundle serves from `https://benishouga.github.io/mm/`. Use the same env var locally (`VITE_BASE_PATH=/mm/ npm run build`) when testing the hosted bundle.
+- Ensure the repository's Pages settings point to "GitHub Actions" after the first successful deployment.

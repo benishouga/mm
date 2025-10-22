@@ -36,6 +36,10 @@ function App() {
     const headerRef = useRef<HTMLDivElement>(null);
     const mmSvgRef = useRef<SVGSVGElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileHandleRef = useRef<FileSystemFileHandle | null>(null);
+
+    const supportsFileSystemAccess =
+      typeof window !== 'undefined' && 'showOpenFilePicker' in window && 'showSaveFilePicker' in window;
 
     const ensureJsonExtension = (name: string) => {
       const trimmed = name.trim();
@@ -57,8 +61,41 @@ function App() {
       return normalizedName;
     };
 
-    const onSaveAs = () => {
-      const defaultName = state.mmid || `mindmap-${uuidv4()}.json`;
+    const writeToHandle = async (handle: FileSystemFileHandle) => {
+      const writable = await handle.createWritable();
+      await writable.write(JSON.stringify(state.idMap, null, 2));
+      await writable.close();
+    };
+
+    const onSaveAs = async () => {
+      const defaultName = ensureJsonExtension(state.mmid || `mindmap-${uuidv4()}.json`);
+
+      if (supportsFileSystemAccess) {
+        try {
+          const handle = await (window as Window & typeof globalThis).showSaveFilePicker({
+            suggestedName: defaultName,
+            types: [
+              {
+                description: 'Mind Map JSON',
+                accept: {
+                  'application/json': ['.json'],
+                },
+              },
+            ],
+          });
+          await writeToHandle(handle);
+          fileHandleRef.current = handle;
+          save(ensureJsonExtension(handle.name));
+        } catch (error) {
+          if ((error as DOMException)?.name === 'AbortError') {
+            return;
+          }
+          console.error(error);
+          alert('ファイルの保存に失敗しました。');
+        }
+        return;
+      }
+
       const input = window.prompt('保存するファイル名（.json）を入力してください', defaultName);
       if (!input) {
         return;
@@ -71,9 +108,27 @@ function App() {
       save(savedName);
     };
 
-    const onSave = () => {
+    const onSave = async () => {
+      if (supportsFileSystemAccess) {
+        if (!fileHandleRef.current) {
+          await onSaveAs();
+          return;
+        }
+        try {
+          await writeToHandle(fileHandleRef.current);
+          save(ensureJsonExtension(fileHandleRef.current.name));
+        } catch (error) {
+          if ((error as DOMException)?.name === 'AbortError') {
+            return;
+          }
+          console.error(error);
+          alert('ファイルの保存に失敗しました。');
+        }
+        return;
+      }
+
       if (!state.mmid) {
-        onSaveAs();
+        await onSaveAs();
         return;
       }
       const savedName = downloadIdMap(state.mmid);
@@ -84,6 +139,7 @@ function App() {
       if (state.isDirty && !confirm('保存されていない変更があります。新規作成しますか？')) {
         return;
       }
+      fileHandleRef.current = null;
       load({ idMap: initialIdMap, mmid: '' });
     };
 
@@ -108,6 +164,7 @@ function App() {
             throw new Error('empty file');
           }
           const parsed = JSON.parse(result);
+          fileHandleRef.current = null;
           load({ idMap: parsed, mmid: ensureJsonExtension(file.name) });
         } catch (error) {
           console.error(error);
@@ -126,6 +183,48 @@ function App() {
 
     const triggerFilePicker = () => {
       fileInputRef.current?.click();
+    };
+
+    const onLoad = async () => {
+      if (state.isDirty && !confirm('保存されていない変更があります。読み込みますか？')) {
+        return;
+      }
+
+      if (supportsFileSystemAccess) {
+        try {
+          const [handle] = await (window as Window & typeof globalThis).showOpenFilePicker({
+            multiple: false,
+            types: [
+              {
+                description: 'Mind Map JSON',
+                accept: {
+                  'application/json': ['.json'],
+                },
+              },
+            ],
+          });
+          if (!handle) {
+            return;
+          }
+          const file = await handle.getFile();
+          const text = await file.text();
+          if (!text) {
+            throw new Error('empty file');
+          }
+          const parsed = JSON.parse(text);
+          fileHandleRef.current = handle;
+          load({ idMap: parsed, mmid: ensureJsonExtension(handle.name) });
+        } catch (error) {
+          if ((error as DOMException)?.name === 'AbortError') {
+            return;
+          }
+          console.error(error);
+          alert('ファイルの読み込みに失敗しました。JSON 形式か確認してください。');
+        }
+        return;
+      }
+
+      triggerFilePicker();
     };
 
     function copyHandler() {
@@ -222,7 +321,7 @@ function App() {
         redo();
       } else if (key === 's' && (event.ctrlKey || event.metaKey)) {
         event.preventDefault();
-        onSave();
+        void onSave();
       }
     }
 
@@ -326,7 +425,7 @@ Ctrl + S で 保存`);
         <div ref={headerRef}>
           <button onClick={() => onCreateNew()}>new</button>
           &nbsp;|&nbsp;
-          <button onClick={() => triggerFilePicker()}>load</button>
+          <button onClick={() => void onLoad()}>load</button>
           <input
             ref={fileInputRef}
             type="file"
@@ -335,9 +434,9 @@ Ctrl + S で 保存`);
             onChange={onLoadFromFile}
           />
           &nbsp;|&nbsp;
-          <button onClick={() => onSave()}>save</button>
+          <button onClick={() => void onSave()}>save</button>
           &nbsp;|&nbsp;
-          <button onClick={() => onSaveAs()}>save as</button>
+          <button onClick={() => void onSaveAs()}>save as</button>
           &nbsp;|&nbsp;
           <button onClick={() => switchView()}>switch</button>
           &nbsp;|&nbsp;
